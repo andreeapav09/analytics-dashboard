@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 6: Memoization & Performance Optimization</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="lesson-meta">Lesson 6 • Performance Deep-Dive</div>
+      <h1>Memoization and Performance Optimization</h1>
+    </header>
+
+    <main>
+      <section>
+        <h2>The Core Problem: React's Render Behavior</h2>
+        <p>
+          By default, when a parent component's state changes in React, **the parent and ALL its children re-execute their functions**. 
+        </p>
+        <p>
+          If your parent component displays a list of 10,000 metrics, and you type in a search input (updating state on every keystroke), React will re-run the render functions for the parent and all 10,000 child rows on every key press. Because JavaScript is single-threaded, this heavy calculations load blocks the main thread, resulting in laggy inputs and visible freeze frames.
+        </p>
+        <p>
+          To solve this when dealing with large datasets, React provides three core **Memoization** tools.
+        </p>
+      </section>
+
+      <section>
+        <h2>1. useMemo: Caching Expensive Computations</h2>
+        <p>
+          <strong><code>useMemo</code></strong> caches the *result* of a calculation between renders. It tells React: *"Do not run this sorting or filtering logic again unless the logs list or the search query has actually changed."*
+        </p>
+
+        <h3>Without useMemo (Slow / Runs on every render)</h3>
+        <pre><code>function Dashboard({ logs, searchQuery }) {
+  // This filter loop runs on EVERY render (e.g., if a timer updates on the dashboard)
+  const filteredLogs = logs.filter(log => log.message.includes(searchQuery));
+  
+  return &lt;DataGrid logs={filteredLogs} /&gt;;
+}</code></pre>
+
+        <h3>With useMemo (Optimized)</h3>
+        <pre><code>function Dashboard({ logs, searchQuery }) {
+  // This only runs when logs or searchQuery changes. Other updates (like timers) skip it.
+  const filteredLogs = useMemo(() => {
+    return logs.filter(log => log.message.includes(searchQuery));
+  }, [logs, searchQuery]); // Dependencies array
+  
+  return &lt;DataGrid logs={filteredLogs} /&gt;;
+}</code></pre>
+
+        <div class="callout">
+          <h4>Angular Parallel: Pure Pipes & Signal Computeds</h4>
+          <p>
+            In Angular, calling a method directly in your template binding (like <code>&lt;div&gt;{{ filterData(data) }}&lt;/div&gt;</code>) is a major performance bottleneck because it runs on <strong>every change detection cycle</strong>.
+          </p>
+          <p>
+            To optimize this, Angular developers use **Pure Pipes** (which only re-run when their inputs change) or **computed Signals** (which cache results). <code>useMemo</code> is React's equivalent of a Pure Pipe or computed Signal.
+          </p>
+        </div>
+      </section>
+
+      <section>
+        <h2>2. React.memo: Caching Component Rendering</h2>
+        <p>
+          <strong><code>React.memo</code></strong> is a higher-order component. It checks the props of a child component. If the new props are identical to the previous props, React **skips rendering the child** completely, reusing its last rendered DOM node.
+        </p>
+
+        <pre><code>// Wrap the component function in React.memo
+const LogRow = React.memo(function LogRow({ log, onFlag }) {
+  console.log("Rendering Row ID:", log.id);
+  return (
+    &lt;div className="row"&gt;
+      &lt;span&gt;{log.message}&lt;/span&gt;
+      &lt;button onClick={() => onFlag(log.id)}&gt;Flag&lt;/button&gt;
+    &lt;/div&gt;
+  );
+});</code></pre>
+
+        <div class="callout">
+          <h4>Angular Parallel: ChangeDetectionStrategy.OnPush</h4>
+          <p>
+            By default, Angular change detection checks all components from top to bottom. When you set **`changeDetection: ChangeDetectionStrategy.OnPush`**, you tell Angular to skip checking this component and its children unless its `@Input()` references change. 
+          </p>
+          <p>
+            <code>React.memo</code> does the exact same thing: it prevents React from traversing down into this component during a render pass unless the inputs (props) change.
+          </p>
+        </div>
+      </section>
+
+      <section>
+        <h2>3. useCallback: Stabilizing Callback References</h2>
+        <p>
+          In JavaScript, functions are objects. This means **referential equality** applies: `() => {} !== () => {}` (two identical functions created at different times do not point to the same memory address).
+        </p>
+        <p>
+          Every time the parent component re-renders, it redeclares and creates a new instance of any functions inside it. If you pass this function as a prop to a memoized child, the child sees a "changed prop" (because the function reference changed) and re-renders anyway, breaking <code>React.memo</code>.
+        </p>
+        <p>
+          <strong><code>useCallback</code></strong> caches the *function reference* itself, maintaining its memory pointer across renders.
+        </p>
+
+        <h3>The Bug (Recreates function, breaks child memoization)</h3>
+        <pre><code>function Dashboard() {
+  const [theme, setTheme] = useState('dark');
+  const handleFlag = (id) => dispatch({ type: 'FLAG', payload: id });
+
+  // Every time theme changes, handleFlag is recreated.
+  // This causes <LogRow onFlag={handleFlag} /> to re-render, even if it is wrapped in React.memo!
+  return &lt;LogRow onFlag={handleFlag} /&gt;;
+}</code></pre>
+
+        <h3>The Fix (Caches function reference)</h3>
+        <pre><code>function Dashboard() {
+  const [theme, setTheme] = useState('dark');
+  
+  // React remembers this function reference. It never changes.
+  const handleFlag = useCallback((id) => {
+    dispatch({ type: 'FLAG', payload: id });
+  }, []); // Empty dependencies = reference is cached forever
+  
+  // Now, changing theme will NOT cause LogRow to re-render!
+  return &lt;LogRow onFlag={handleFlag} /&gt;;
+}</code></pre>
+      </section>
+
+      <section class="quiz-section">
+        <div class="quiz-title">Interactive Retrieval Practice</div>
+        <div class="quiz-question">
+          If a parent component re-renders, and it passes a callback function defined like `const clickHandler = () => {}` to a child component wrapped in `React.memo`, what happens?
+        </div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="checkAnswer(this, true, 'Option A')">
+            <span>A:</span> The child component re-renders because `clickHandler` gets a new memory reference.
+          </div>
+          <div class="quiz-option" onclick="checkAnswer(this, false, 'Option B')">
+            <span>B:</span> The child component skips rendering because `React.memo` ignores function props.
+          </div>
+          <div class="quiz-option" onclick="checkAnswer(this, false, 'Option C')">
+            <span>C:</span> React throws a runtime compilation warning in the browser console.
+          </div>
+        </div>
+        <div id="quiz-feedback-box" class="quiz-feedback"></div>
+      </section>
+
+      <section>
+        <h2>Next Steps</h2>
+        <p>
+          In our <strong>MetricsStream</strong> project, we will combine these three concepts to render 10,000 logs with complete fluid responsiveness.
+        </p>
+        <p>
+          <strong>Primary Resource to Explore:</strong> Read the <a href="https://react.dev/reference/react/useCallback" target="_blank" class="nav-link">React Docs on useCallback</a>.
+        </p>
+      </main>
+
+      <footer>
+        <span><a href="0005-usereducer-complex-state.html" class="nav-link">← Lesson 5: useReducer</a></span>
+        <span><a href="../reference/react-hooks-reference.html" class="nav-link">Hooks Reference Sheet →</a></span>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    function checkAnswer(selectedOption, isCorrect, label) {
+      const options = document.querySelectorAll('.quiz-option');
+      options.forEach(opt => {
+        opt.classList.remove('correct', 'incorrect');
+      });
+
+      const feedbackBox = document.getElementById('quiz-feedback-box');
+      
+      if (isCorrect) {
+        selectedOption.classList.add('correct');
+        feedbackBox.className = 'quiz-feedback success';
+        feedbackBox.innerHTML = '<strong>Correct!</strong> Because functions are objects in JavaScript, recreating them creates a new memory reference. <code>React.memo</code> performs a shallow comparison of props; seeing a new reference, it assumes the prop changed and re-renders the child. <code>useCallback</code> fixes this.';
+      } else {
+        selectedOption.classList.add('incorrect');
+        feedbackBox.className = 'quiz-feedback error';
+        feedbackBox.innerHTML = '<strong>Incorrect.</strong> Try again! Remember: <code>React.memo</code> does shallow comparison of all props, including functions. Since functions are objects, a new reference triggers a re-render unless cached.';
+      }
+    }
+  </script>
+</body>
+</html>

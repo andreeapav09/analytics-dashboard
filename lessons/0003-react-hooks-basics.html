@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 3: Core React Hooks (useState, useEffect, useRef)</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="lesson-meta">Lesson 3 • React Hooks</div>
+      <h1>Core React Hooks: State, Side Effects, and References</h1>
+    </header>
+
+    <main>
+      <section>
+        <h2>What are Hooks?</h2>
+        <p>
+          Before React 16.8, state and lifecycle methods were only available in Class components. <strong>Hooks</strong> allow functional components to use state and other React features.
+        </p>
+        <p>
+          If you know Vue's <em>Composition API</em> (e.g., <code>ref</code>, <code>watchEffect</code>), Hooks will feel familiar. However, because React re-runs the entire function on every render, Hooks rely on call order consistency.
+        </p>
+      </section>
+
+      <section>
+        <h2>The Core Hooks</h2>
+        
+        <h3>1. useState</h3>
+        <p>
+          Declares state variables. It returns an array with the current state value and an updater function.
+        </p>
+        <pre><code>const [count, setCount] = useState(0);</code></pre>
+        <div class="callout">
+          <h4>Asynchronous Updates</h4>
+          <p>
+            React state updates are batched and asynchronous. If you need to update state based on the previous state value, always pass an updater function:
+          </p>
+          <pre><code>// Correct way for consecutive updates
+setCount(prevCount => prevCount + 1);</code></pre>
+        </div>
+
+        <h3>2. useEffect</h3>
+        <p>
+          Handles side effects (data fetching, subscriptions, manual DOM mutations). It is the combined equivalent of Angular's lifecycle methods (<code>ngOnInit</code>, <code>ngOnDestroy</code>) or Vue's lifecycle hooks.
+        </p>
+        <p>
+          Its behavior is controlled by its <strong>dependency array</strong>:
+        </p>
+        <ul>
+          <li><strong>No dependency array:</strong> Runs after <em>every</em> single render. (Rarely desired).</li>
+          <li><strong>Empty dependency array <code>[]</code>:</strong> Runs exactly <em>once</em> after the initial render (equivalent to <code>ngOnInit</code>).</li>
+          <li><strong>With dependencies <code>[dep1, dep2]</code>:</strong> Runs after the initial render and then again whenever any listed dependency changes.</li>
+        </ul>
+        <p>
+          <strong>Effect Cleanup:</strong> If your effect returns a function, React runs this function when the component unmounts (equivalent to <code>ngOnDestroy</code>) or before running the effect again.
+        </p>
+        <pre><code>useEffect(() => {
+  const handleResize = () => console.log(window.innerWidth);
+  window.addEventListener('resize', handleResize);
+
+  // Cleanup function
+  return () => {
+    window.removeEventListener('resize', handleResize);
+  };
+}, []); // Runs once, cleans up on unmount</code></pre>
+
+        <h3>3. useRef</h3>
+        <p>
+          Creates a mutable object whose <code>.current</code> property persists across renders. Key characteristics:
+        </p>
+        <ul>
+          <li>Updating a ref <strong>does not</strong> trigger a re-render.</li>
+          <li>Used to store DOM node references (e.g., focusing an input).</li>
+          <li>Used to keep track of values across renders without triggering rendering (e.g., timer IDs).</li>
+        </ul>
+        <pre><code>const inputRef = useRef(null);
+const focusInput = () => inputRef.current.focus();
+
+return &lt;input ref={inputRef} /&gt;;</code></pre>
+      </section>
+
+      <section>
+        <h2>The Rules of Hooks</h2>
+        <p>
+          React determines which state corresponds to which hook call by the order in which they are declared. Therefore, you must follow these rules:
+        </p>
+        <ol>
+          <li><strong>Only call Hooks at the top level:</strong> Do not call hooks inside loops, conditions, or nested functions.</li>
+          <li><strong>Only call Hooks from React functions:</strong> Call them from React functional components or custom hooks. Do not call them from standard JS functions.</li>
+        </ol>
+      </section>
+
+      <section class="quiz-section">
+        <div class="quiz-title">Interactive Retrieval Practice</div>
+        <div class="quiz-question">
+          What happens if you omit the dependency array in a useEffect hook call?
+        </div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="checkAnswer(this, true, 'Option A')">
+            <span>A:</span> The effect runs after every component render.
+          </div>
+          <div class="quiz-option" onclick="checkAnswer(this, false, 'Option B')">
+            <span>B:</span> The effect executes only on the initial mount.
+          </div>
+          <div class="quiz-option" onclick="checkAnswer(this, false, 'Option C')">
+            <span>C:</span> The effect will throw a compiler runtime error.
+          </div>
+        </div>
+        <div id="quiz-feedback-box" class="quiz-feedback"></div>
+      </section>
+
+      <section>
+        <h2>Next Steps</h2>
+        <p>
+          Next, we will explore <strong>Memoization</strong> and advanced performance hooks like <code>useMemo</code>, <code>useCallback</code>, and how to avoid unnecessary re-renders.
+        </p>
+        <p>
+          <strong>Primary Resource to Explore:</strong> Review <a href="https://react.dev/reference/react/hooks" target="_blank" class="nav-link">React Built-in Hooks API Reference</a>.
+        </p>
+        <div class="callout">
+          <h4>💡 Teacher Reminder</h4>
+          <p>
+            Do you have questions about how <code>useEffect</code> lifecycle handling differs from Angular's <code>ngOnChanges</code> or <code>ngOnInit</code>? Let's discuss it!
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span><a href="0002-react-architecture-dom-state-props.html" class="nav-link">← Lesson 2: React Foundations</a></span>
+      <span><a href="../reference/react-hooks-reference.html" class="nav-link">Hooks Reference Sheet →</a></span>
+    </footer>
+  </div>
+
+  <script>
+    function checkAnswer(selectedOption, isCorrect, label) {
+      const options = document.querySelectorAll('.quiz-option');
+      options.forEach(opt => {
+        opt.classList.remove('correct', 'incorrect');
+      });
+
+      const feedbackBox = document.getElementById('quiz-feedback-box');
+      
+      if (isCorrect) {
+        selectedOption.classList.add('correct');
+        feedbackBox.className = 'quiz-feedback success';
+        feedbackBox.innerHTML = '<strong>Correct!</strong> Omiting the dependency array entirely causes the effect to run on every single render. This is a common performance pitfall.';
+      } else {
+        selectedOption.classList.add('incorrect');
+        feedbackBox.className = 'quiz-feedback error';
+        feedbackBox.innerHTML = '<strong>Incorrect.</strong> Remember: Omiting the array is different from passing an empty array <code>[]</code>. An empty array runs once, while no array runs on every render.';
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 8: Testing React Applications</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="lesson-meta">Lesson 8 • Testing</div>
+      <h1>Testing React Applications</h1>
+    </header>
+
+    <main>
+      <section>
+        <h2>The React Testing Ecosystem</h2>
+        <p>
+          Testing React applications usually involves two core tools working together:
+        </p>
+        <ul>
+          <li><strong>Test Runner (Vitest or Jest):</strong> Runs the tests, matches files (e.g., <code>*.test.jsx</code>), and provides assertion functions like <code>expect(a).toBe(b)</code>. In modern Vite apps, **Vitest** is the standard.</li>
+          <li><strong>Testing Library (React Testing Library - RTL):</strong> Provides helpers to render components in a mock DOM and query elements (e.g., finding buttons, typing into inputs) just like a real user would.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>The React Testing Library (RTL) Philosophy</h2>
+        <div class="callout">
+          <h4>Key Rule of RTL</h4>
+          <p>
+            <em>"The more your tests resemble the way your software is used, the more confidence they can give you."</em>
+          </p>
+          <p>
+            Avoid testing internal component state or implementation details (e.g., do not verify if <code>state.count === 1</code>). Instead, test what the user sees: check if the text on the screen displays <code>"1"</code>.
+          </p>
+        </div>
+      </section>
+
+      <section>
+        <h2>Basic Component Test Example</h2>
+        <pre><code>import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect } from 'vitest';
+import Counter from './Counter';
+
+describe('Counter Component', () => {
+  it('should render initial count and increment on click', () => {
+    // 1. Render the component in virtual browser environment
+    render(&lt;Counter /&gt;);
+
+    // 2. Query elements by what the user sees (role, text)
+    const button = screen.getByRole('button', { name: /click/i });
+    const textElement = screen.getByText(/count: 0/i);
+
+    expect(textElement).toBeInTheDocument();
+
+    // 3. Simulate user interactions
+    fireEvent.click(button);
+
+    // 4. Assert updated state is drawn on the screen
+    expect(screen.getByText(/count: 1/i)).toBeInTheDocument();
+  });
+});</code></pre>
+      </section>
+
+      <section>
+        <h2>Angular & Vue Parallels</h2>
+        <div class="callout">
+          <h4>How does this map to what you know?</h4>
+          <ul>
+            <li><strong>Angular (TestBed):</strong> Angular uses <code>TestBed</code> to compile components, which often requires importing extensive lists of mock Modules, Providers, and Declarations. In React, there is no dependency injection or module system: you simply call <code>render(&lt;Component /&gt;)</code> and mock external imports with standard JS mocks. It is significantly faster and cleaner.</li>
+            <li><strong>Vue (Vue Test Utils):</strong> Conceptually identical. Vue also uses standard testing libraries (`@testing-library/vue`) to query and interact with components dynamically in a mock DOM.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h2>High-Level E2E Testing Strategy</h2>
+        <p>
+          While unit tests verify component logic in isolation, **End-to-End (E2E) testing** runs your entire application in a real browser (Chrome, Firefox, Safari) and logs into a staging server to test full workflows.
+        </p>
+        <p>
+          The two standard E2E testing tools in modern development are **Playwright** and **Cypress**. For interviews, know that Playwright is highly favored for its speed, automatic waiting, and excellent support for parallel execution.
+        </p>
+      </section>
+
+      <section class="quiz-section">
+        <div class="quiz-title">Interactive Retrieval Practice</div>
+        <div class="quiz-question">
+          According to the React Testing Library philosophy, which query should you prefer when finding a button?
+        </div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="checkAnswer(this, false, 'Option A')">
+            <span>A:</span> Finding it by accessing the internal state variable `buttonRef`.
+          </div>
+          <div class="quiz-option" onclick="checkAnswer(this, true, 'Option B')">
+            <span>B:</span> Finding it by its accessibility role: `screen.getByRole('button', { name: /submit/i })`.
+          </div>
+          <div class="quiz-option" onclick="checkAnswer(this, false, 'Option C')">
+            <span>C:</span> Finding it by scanning the private CSS class name selector: `.submit-btn-v3`.
+          </div>
+        </div>
+        <div id="quiz-feedback-box" class="quiz-feedback"></div>
+      </section>
+
+      <section>
+        <h2>Congratulations!</h2>
+        <p>
+          You have successfully completed the theoretical foundations. You are ready to start building the **MetricsStream Dashboard** to put all of these concepts into practice!
+        </p>
+        <p>
+          <strong>Primary Resource to Explore:</strong> Read the <a href="https://testing-library.com/docs/react-testing-library/intro/" target="_blank" class="nav-link">React Testing Library Official Intro</a>.
+        </p>
+      </div>
+    </main>
+
+    <footer>
+      <span><a href="0007-lazy-loading-code-splitting.html" class="nav-link">← Lesson 7: Lazy Loading</a></span>
+      <span><a href="../reference/react-foundations.html" class="nav-link">React Reference Sheet →</a></span>
+    </footer>
+  </div>
+
+  <script>
+    function checkAnswer(selectedOption, isCorrect, label) {
+      const options = document.querySelectorAll('.quiz-option');
+      options.forEach(opt => {
+        opt.classList.remove('correct', 'incorrect');
+      });
+
+      const feedbackBox = document.getElementById('quiz-feedback-box');
+      
+      if (isCorrect) {
+        selectedOption.classList.add('correct');
+        feedbackBox.className = 'quiz-feedback success';
+        feedbackBox.innerHTML = '<strong>Correct!</strong> Querying by accessibility roles (like <code>getByRole</code>) mimics how screen readers and users interact with the page, making your tests highly resilient to changes in markup or class styling.';
+      } else {
+        selectedOption.classList.add('incorrect');
+        feedbackBox.className = 'quiz-feedback error';
+        feedbackBox.innerHTML = '<strong>Incorrect.</strong> Querying by internal state or implementation CSS classes makes your tests brittle (they break when you refactor styling). Prefer accessibility-based queries like <code>getByRole</code>. Try again!';
+      }
+    }
+  </script>
+</body>
+</html>

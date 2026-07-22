@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 7: Lazy Loading & Code Splitting</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="lesson-meta">Lesson 7 • Loading Performance</div>
+      <h1>Lazy Loading and Code Splitting</h1>
+    </header>
+
+    <main>
+      <section>
+        <h2>What is Code Splitting?</h2>
+        <p>
+          By default, bundlers like Webpack or Vite merge all your JavaScript code into a single, massive file (bundle). If your analytics app has heavy charts, CSV export libraries, and admin portals, the user has to download *everything* before the page loads.
+        </p>
+        <p>
+          <strong>Code Splitting</strong> splits your application into smaller JavaScript chunks that are downloaded on-demand (only when the user visits a certain tab or opens a heavy chart).
+        </p>
+      </section>
+
+      <section>
+        <h2>React.lazy and Suspense</h2>
+        <p>
+          React has built-in support for lazy loading components using <strong><code>React.lazy</code></strong> and the <strong><code>&lt;Suspense&gt;</code></strong> wrapper.
+        </p>
+        <pre><code>import React, { lazy, Suspense } from 'react';
+
+// 1. Lazy-load the heavy component using a dynamic import
+const HeavyChart = lazy(() => import('./HeavyChart'));
+
+function Dashboard() {
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;Analytics Dashboard&lt;/h1&gt;
+
+      {/* 2. Wrap the lazy component in Suspense with a loading fallback */}
+      &lt;Suspense fallback={&lt;div&gt;Loading Chart...&lt;/div&gt;}&gt;
+        &lt;HeavyChart /&gt;
+      &lt;/Suspense&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+      </section>
+
+      <section>
+        <h2>Angular & Vue Parallels</h2>
+        <div class="callout">
+          <h4>How does this map to what you know?</h4>
+          <ul>
+            <li><strong>Angular:</strong> Exactly like **Lazy-Loaded Routing** (using <code>loadChildren</code>) or Angular 17's new **<code>@defer</code> blocks**, which dynamically load parts of templates only when they enter the viewport or under custom trigger rules.</li>
+            <li><strong>Vue:</strong> Exactly like Vue's **<code>defineAsyncComponent</code>** paired with Vue's own native **<code>&lt;Suspense&gt;</code>** tag.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="quiz-section">
+        <div class="quiz-title">Interactive Retrieval Practice</div>
+        <div class="quiz-question">
+          What is the purpose of the fallback prop in React's Suspense component?
+        </div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="checkAnswer(this, false, 'Option A')">
+            <span>A:</span> It acts as a safety catch-all for application errors.
+          </div>
+          <div class="quiz-option" onclick="checkAnswer(this, true, 'Option B')">
+            <span>B:</span> It displays temporary UI (like a spinner) while the lazy component is loading.
+          </div>
+          <div class="quiz-option" onclick="checkAnswer(this, false, 'Option C')">
+            <span>C:</span> It stores fallback state data if the main server goes offline.
+          </div>
+        </div>
+        <div id="quiz-feedback-box" class="quiz-feedback"></div>
+      </section>
+
+      <section>
+        <h2>Next Steps</h2>
+        <p>
+          We will implement lazy loading for our dashboard's visualization tab. Next, let's learn how to write **Unit Tests** for our React components and hooks to verify they work correctly.
+        </p>
+        <p>
+          <strong>Primary Resource to Explore:</strong> Read the <a href="https://react.dev/reference/react/Suspense" target="_blank" class="nav-link">React Docs on Suspense</a>.
+        </p>
+        <div class="callout">
+          <h4>💡 Teacher Reminder</h4>
+          <p>
+            Lazy loading is not just for pages! You can lazy load heavy UI modals, tabs, or third-party libraries (like PDF generators). Ask me how to split libraries!
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span><a href="0006-memoization-performance-optimization.html" class="nav-link">← Lesson 6: Memoization</a></span>
+      <span><a href="../reference/react-foundations.html" class="nav-link">React Reference Sheet →</a></span>
+    </footer>
+  </div>
+
+  <script>
+    function checkAnswer(selectedOption, isCorrect, label) {
+      const options = document.querySelectorAll('.quiz-option');
+      options.forEach(opt => {
+        opt.classList.remove('correct', 'incorrect');
+      });
+
+      const feedbackBox = document.getElementById('quiz-feedback-box');
+      
+      if (isCorrect) {
+        selectedOption.classList.add('correct');
+        feedbackBox.className = 'quiz-feedback success';
+        feedbackBox.innerHTML = '<strong>Correct!</strong> The <code>fallback</code> prop accepts any React element (like a spinner, skeleton text, or message) to display while the browser fetches the lazy-loaded JS chunk.';
+      } else {
+        selectedOption.classList.add('incorrect');
+        feedbackBox.className = 'quiz-feedback error';
+        feedbackBox.innerHTML = '<strong>Incorrect.</strong> The <code>fallback</code> prop is for loading indicators, not error handling (which is done via Error Boundaries). Try again!';
+      }
+    }
+  </script>
+</body>
+</html>

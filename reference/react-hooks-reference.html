@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reference: Core React Hooks</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    @media print {
+      body { background: white; color: black; padding: 0; }
+      .container { max-width: 100%; padding: 0; }
+      .no-print { display: none; }
+    }
+
+    .ref-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    
+    @media (max-width: 768px) {
+      .ref-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .ref-card {
+      background-color: var(--code-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.2rem;
+    }
+
+    .ref-card h3 {
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.3rem;
+      color: var(--accent-color);
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+
+    .comparison-table th, .comparison-table td {
+      border: 1px solid var(--border-color);
+      padding: 0.8rem;
+      text-align: left;
+      font-size: 1rem;
+    }
+
+    .comparison-table th {
+      background-color: var(--code-bg);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="lesson-meta">Cheat Sheet / Reference</div>
+      <h1>Core React Hooks Cheat Sheet</h1>
+    </header>
+
+    <main>
+      <div class="ref-grid">
+        <div class="ref-card">
+          <h3>Hook Reference Summary</h3>
+          <ul>
+            <li><strong>useState:</strong> Persistent local component state. Updating triggers render.</li>
+            <li><strong>useEffect:</strong> Handles side-effects, API calls, subscriptions, event listeners.</li>
+            <li><strong>useRef:</strong> Persistent reference value. Updating <em>does not</em> trigger render. Accesses DOM nodes directly.</li>
+          </ul>
+        </div>
+
+        <div class="ref-card">
+          <h3>Lifecycle Translations</h3>
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>Lifecycle Goal</th>
+                <th>Angular Equivalent</th>
+                <th>Vue Equivalent</th>
+                <th>React Hooks Pattern</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Component Mounted</td>
+                <td><code>ngOnInit</code></td>
+                <td><code>mounted</code> / <code>onMounted</code></td>
+                <td><code>useEffect(() => {}, [])</code></td>
+              </tr>
+              <tr>
+                <td>Component Unmounted</td>
+                <td><code>ngOnDestroy</code></td>
+                <td><code>unmounted</code> / <code>onUnmounted</code></td>
+                <td><code>useEffect(() => { return () => {...} }, [])</code></td>
+              </tr>
+              <tr>
+                <td>Dependency Updated</td>
+                <td><code>ngOnChanges</code></td>
+                <td><code>watch</code> / <code>watchEffect</code></td>
+                <td><code>useEffect(() => {}, [dep])</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <section>
+        <h2>The Dependency Array Rulebook</h2>
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Syntax</th>
+              <th>Trigger Frequency</th>
+              <th>Ideal Use Cases</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>useEffect(fn)</code></td>
+              <td>After EVERY render</td>
+              <td>Rare. Debugging, global performance sync.</td>
+            </tr>
+            <tr>
+              <td><code>useEffect(fn, [])</code></td>
+              <td>Exactly ONCE (on mount)</td>
+              <td>Data fetching, setup listeners, one-time logs.</td>
+            </tr>
+            <tr>
+              <td><code>useEffect(fn, [val])</code></td>
+              <td>On mount, and whenever <code>val</code> changes</td>
+              <td>Re-fetching data on ID change, updating calculations.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Crucial Rules to Remember</h2>
+        <ul>
+          <li><strong>Rule 1:</strong> Call Hooks only at the top level. Avoid nested functions, conditions (if blocks), or loops.</li>
+          <li><strong>Rule 2:</strong> Call Hooks only from functional components or custom hooks. Standard JS modules cannot parse hooks.</li>
+          <li><strong>Rule 3:</strong> Always clean up listeners, intervals, and subscriptions inside the return function of <code>useEffect</code> to prevent memory leaks.</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="no-print">
+      <span><a href="../lessons/0003-react-hooks-basics.html" class="nav-link">← Lesson 3</a></span>
+      <span><a href="../MISSION.md" class="nav-link">Mission Page →</a></span>
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 1: Agentic Coding & Customizations</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="lesson-meta">Lesson 1 • Agentic Coding</div>
+      <h1>Customizing AI Agents via Rules and Skills</h1>
+    </header>
+
+    <main>
+      <section>
+        <h2>The Paradigm of Agentic Coding</h2>
+        <p>
+          In traditional software development, coding assistants function as advanced autocompletes (e.g., inline suggestions). In <strong>Agentic Coding</strong>, the AI assistant acts as an autonomous collaborator. You provide a high-level goal, and the agent plans, researches, writes, edits, tests, and verifies the solution.
+        </p>
+        <p>
+          To make agentic coding reliable in professional environments, we use <strong>AI Coding Harnesses</strong>. A harness wraps the language model with execution sandboxes, local file tools, terminal access, and rulesets. It shifts the human's role from "writing code line-by-line" to "steering, reviewing, and defining constraints."
+        </p>
+      </section>
+
+      <section>
+        <h2>Rules vs. Skills: The Two Core Extensions</h2>
+        <p>
+          To customize an agent's behavior and system prompt, we define two types of files: <strong>Rules</strong> (using <code>AGENTS.md</code> or <code>.md</code> rule files) and <strong>Skills</strong> (using <code>SKILL.md</code> files inside skill directories).
+        </p>
+
+        <div class="callout">
+          <h4>Key Insight</h4>
+          <p>
+            Think of <strong>Rules</strong> as permanent, project-wide guardrails (e.g., "Always use TypeScript types"). Think of <strong>Skills</strong> as specialized, on-demand modules containing instructions, checklists, and scripts (e.g., "Deploying to production" or "Teaching a new framework").
+          </p>
+        </div>
+
+        <h3>1. Workspace & Global Rules (AGENTS.md)</h3>
+        <p>
+          Rules are broad instructions appended to the agent's baseline system prompt. In Antigravity, rules can be defined globally or scoped to a project workspace:
+        </p>
+        <ul>
+          <li><strong>Global Rules:</strong> Applied to every workspace. Saved in the user's global config directory (e.g., <code>C:\Users\z0043xbv\.gemini\config\AGENTS.md</code>).</li>
+          <li><strong>Project-Scoped Rules:</strong> Specific to the workspace. Saved in the project root under <code>.agents/AGENTS.md</code>.</li>
+        </ul>
+        <p>
+          Rules are excellent for defining code styling guidelines, test coverage thresholds, deprecated APIs to avoid, or architectural conventions.
+        </p>
+
+        <h3>2. Specialized Skills (SKILL.md)</h3>
+        <p>
+          Skills are self-contained directories that extend the agent with domain-specific knowledge and procedures. Each skill is located in a <code>skills/&lt;skill_name&gt;/</code> directory under global or workspace config roots, containing:
+        </p>
+        <ul>
+          <li><code>SKILL.md</code>: The entrypoint containing YAML frontmatter and detailed markdown instructions.</li>
+          <li><code>scripts/</code>, <code>examples/</code>, <code>resources/</code>: Optional assets that support the skill's execution.</li>
+        </ul>
+        <p>
+          The YAML frontmatter defined in <code>SKILL.md</code> is critical. It must contain the skill's <strong>name</strong> and a clear <strong>description</strong>. The harness uses semantic matchers or keyword search on these fields to suggest or auto-load the skill when the user asks a matching question.
+        </p>
+      </section>
+
+      <section>
+        <h2>Typical Frontmatter Structure</h2>
+        <p>
+          Here is a typical <code>SKILL.md</code> configuration:
+        </p>
+        <pre><code>---
+name: react-component-generator
+description: Generate standard React functional components with Storybook and RTL tests.
+argument-hint: "Name of the component to generate (e.g., Button)"
+---
+
+## Component Guidelines
+1. Always create the component file in `./src/components/`.
+2. Generate a corresponding `.stories.tsx` storybook file.
+3. Write a `.test.tsx` file asserting render and user event behaviors.</code></pre>
+      </section>
+
+      <section class="quiz-section">
+        <div class="quiz-title">Interactive Retrieval Practice</div>
+        <div class="quiz-question">
+          Which document is best suited for establishing project-wide styling and linting constraints?
+        </div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="checkAnswer(this, false, 'Option A')">
+            <span>A:</span> A custom SKILL.md file inside the local skills folder.
+          </div>
+          <div class="quiz-option" onclick="checkAnswer(this, true, 'Option B')">
+            <span>B:</span> An AGENTS.md file placed within the project root directory.
+          </div>
+          <div class="quiz-option" onclick="checkAnswer(this, false, 'Option C')">
+            <span>C:</span> A global RESOURCES.md directory inside the config folder.
+          </div>
+        </div>
+        <div id="quiz-feedback-box" class="quiz-feedback"></div>
+      </section>
+
+      <section>
+        <h2>Next Steps & Follow-up</h2>
+        <p>
+          Now that you understand how agents discover rules and skills, let's explore how MCP (Model Context Protocol) servers expose tools to the agent, or start diving into React's core virtual DOM architecture.
+        </p>
+        <p>
+          <strong>Primary Resource to Explore:</strong> Read the built-in <a href="../../builtin/skills/antigravity_guide/SKILL.md" class="nav-link">Antigravity Guide SKILL.md</a> for concrete examples of CLI usage and customizations.
+        </p>
+        <div class="callout">
+          <h4>💡 Teacher Reminder</h4>
+          <p>
+            Please ask me any follow-up questions you have about rules, skills, or AI harnesses before we move on to the next lesson!
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span><a href="../MISSION.md" class="nav-link">← Workspace Mission</a></span>
+      <span><a href="../RESOURCES.md" class="nav-link">Curated Resources →</a></span>
+    </footer>
+  </div>
+
+  <script>
+    function checkAnswer(selectedOption, isCorrect, label) {
+      const options = document.querySelectorAll('.quiz-option');
+      options.forEach(opt => {
+        opt.classList.remove('correct', 'incorrect');
+      });
+
+      const feedbackBox = document.getElementById('quiz-feedback-box');
+      
+      if (isCorrect) {
+        selectedOption.classList.add('correct');
+        feedbackBox.className = 'quiz-feedback success';
+        feedbackBox.innerHTML = '<strong>Correct!</strong> AGENTS.md in the project root is the standard location for defining project-specific behavioral rules and style guardrails.';
+      } else {
+        selectedOption.classList.add('incorrect');
+        feedbackBox.className = 'quiz-feedback error';
+        feedbackBox.innerHTML = '<strong>Incorrect.</strong> Try again! Remember: Rules constraints go into AGENTS.md, while procedural checklists/scripts belong in SKILL.md.';
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reference: Agentic Coding Customizations & MCP</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    /* Printing optimization */
+    @media print {
+      body {
+        background: white;
+        color: black;
+        padding: 0;
+      }
+      .container {
+        max-width: 100%;
+        padding: 0;
+      }
+      .no-print {
+        display: none;
+      }
+    }
+    
+    .ref-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    
+    @media (max-width: 768px) {
+      .ref-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .ref-card {
+      background-color: var(--code-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.2rem;
+    }
+
+    .ref-card h3 {
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.3rem;
+      color: var(--accent-color);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="lesson-meta">Cheat Sheet / Reference</div>
+      <h1>Agentic Coding Reference</h1>
+      <p class="no-print">Quick reference guide for customizing AI coding agents, managing project rules, defining custom skills, and using MCP servers.</p>
+    </header>
+
+    <main>
+      <div class="ref-grid">
+        <!-- Card 1: AGENTS.md (Rules) -->
+        <div class="ref-card">
+          <h3>1. Rules (AGENTS.md)</h3>
+          <p><strong>Purpose:</strong> Appends persistent, project-wide or global behavioral constraints directly to the agent's base instructions.</p>
+          <p><strong>Locations:</strong></p>
+          <ul>
+            <li><strong>Global:</strong> <code>C:\Users\&lt;username&gt;\.gemini\config\AGENTS.md</code></li>
+            <li><strong>Workspace:</strong> <code>&lt;project_root&gt;\.agents\AGENTS.md</code></li>
+          </ul>
+          <p><strong>Best For:</strong> Code styling, architecture standards, testing levels, security policies, and tech-stack choices.</p>
+        </div>
+
+        <!-- Card 2: SKILL.md (Skills) -->
+        <div class="ref-card">
+          <h3>2. Skills (SKILL.md)</h3>
+          <p><strong>Purpose:</strong> Procedural, on-demand modules containing checklists, instructions, and scripts for specific tasks.</p>
+          <p><strong>Structure:</strong></p>
+          <pre><code>skills/&lt;skill_name&gt;/
+├── SKILL.md (Frontmatter + Guide)
+├── scripts/ (Helper scripts)
+├── examples/ (Code snippets)
+└── resources/ (Assets or docs)</code></pre>
+          <p><strong>Matching:</strong> Triggered via description/name match. Exposes files/tools to the agent.</p>
+        </div>
+      </div>
+
+      <div class="ref-grid">
+        <!-- Card 3: SKILL.md Frontmatter -->
+        <div class="ref-card">
+          <h3>3. SKILL.md Frontmatter Fields</h3>
+          <ul>
+            <li><code>name</code> (String): Unique identifier. Matches commands and triggers.</li>
+            <li><code>description</code> (String): Short summary for matching search intent.</li>
+            <li><code>argument-hint</code> (String): Placeholder for argument hint in CLI / UI.</li>
+            <li><code>disable-model-invocation</code> (Boolean): Disables direct AI call, routing through custom logic instead.</li>
+          </ul>
+        </div>
+
+        <!-- Card 4: Model Context Protocol (MCP) -->
+        <div class="ref-card">
+          <h3>4. Model Context Protocol (MCP)</h3>
+          <p><strong>Purpose:</strong> Open standard that enables AI models to connect securely to local/remote tools, data sources, and services.</p>
+          <p><strong>Core Capabilities:</strong></p>
+          <ul>
+            <li><strong>Tools:</strong> Executable functions (e.g., compile code, search DB, query APIs).</li>
+            <li><strong>Resources:</strong> Semi-static data sources (e.g., database schemas, logs, API docs).</li>
+            <li><strong>Prompts:</strong> Pre-built templates/workflows for the agent to reuse.</li>
+          </ul>
+        </div>
+      </div>
+
+      <section>
+        <h2>Best Practices for Writing System-Level Instructions</h2>
+        <ul>
+          <li><strong>Clear Precedence:</strong> When conflicts occur between global rules and workspace rules, workspace rules override.</li>
+          <li><strong>Be Actionable:</strong> Write rules as specific constraints ("Do not use X") or step-by-step procedures rather than general observations.</li>
+          <li><strong>Write for the Parser:</strong> Maintain well-structured YAML frontmatter in <code>SKILL.md</code>. A missing line or incorrect key will prevent the agent from discovering it.</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="no-print">
+      <span><a href="../lessons/0001-agentic-coding-customizations.html" class="nav-link">← Lesson 1</a></span>
+      <span><a href="../MISSION.md" class="nav-link">Mission Page →</a></span>
+    </footer>
+  </div>
+</body>
+</html>

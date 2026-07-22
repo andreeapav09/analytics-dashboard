@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+dev-dashboard/node_modules/
+
+# Production build outputs
+dist/
+dev-dashboard/dist/
+
+# Local env files
+.env
+.env.local
+.env.*.local
+
+# IDE & OS files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# System generated logs
+*.log

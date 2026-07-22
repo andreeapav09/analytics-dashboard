@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 5: Complex State Management with useReducer</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="lesson-meta">Lesson 5 • State Management</div>
+      <h1>Complex State Management with useReducer</h1>
+    </header>
+
+    <main>
+      <section>
+        <h2>What is useReducer?</h2>
+        <p>
+          As your React components grow in complexity, managing state with multiple <code>useState</code> hooks can make your code messy and hard to test. 
+        </p>
+        <p>
+          <strong><code>useReducer</code></strong> is a built-in React hook designed to handle complex state logic. It is inspired by the Redux architecture: instead of updating state directly, you <strong>dispatch actions</strong> that describe what happened, and a central <strong>reducer function</strong> calculates the new state.
+        </p>
+      </section>
+
+      <section>
+        <h2>The Anatomy of useReducer</h2>
+        <p>
+          Using <code>useReducer</code> requires four key parts:
+        </p>
+        <ul>
+          <li><strong>Initial State:</strong> The starting value of your state (often an object).</li>
+          <li><strong>Action:</strong> A plain JavaScript object that describes what occurred. It must have a <code>type</code> property (e.g., <code>{ type: 'ADD_TODO', payload: 'Buy milk' }</code>).</li>
+          <li><strong>Reducer Function:</strong> A pure function that takes the current <code>(state, action)</code> and returns the *new* state. It contains no side effects.</li>
+          <li><strong>Dispatch:</strong> A function provided by React that you call to send actions to the reducer.</li>
+        </ul>
+        <pre><code>const [state, dispatch] = useReducer(reducer, initialState);</code></pre>
+      </section>
+
+      <section>
+        <h2>Code Example: Managing a List of Logs</h2>
+        <pre><code>// 1. Initial State
+const initialState = { logs: [] };
+
+// 2. Reducer Function
+function logReducer(state, action) {
+  switch (action.type) {
+    case 'ADD_LOG':
+      return { logs: [...state.logs, action.payload] };
+    case 'CLEAR_LOGS':
+      return { logs: [] };
+    default:
+      return state;
+  }
+}
+
+// 3. Component
+function Logger() {
+  const [state, dispatch] = useReducer(logReducer, initialState);
+
+  return (
+    &lt;div&gt;
+      &lt;button onClick={() => dispatch({ type: 'ADD_LOG', payload: 'Log entry' })}&gt;
+        Add Log
+      &lt;/button&gt;
+      &lt;button onClick={() => dispatch({ type: 'CLEAR_LOGS' })}&gt;
+        Clear Logs
+      &lt;/button&gt;
+      &lt;ul&gt;
+        {state.logs.map((log, index) => &lt;li key={index}&gt;{log}&lt;/li&gt;)}
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+      </section>
+
+      <section>
+        <h2>Angular & Vue Parallels</h2>
+        <div class="callout">
+          <h4>How does this map to what you know?</h4>
+          <ul>
+            <li><strong>Angular (NgRx):</strong> If you have worked with NgRx or Redux in Angular, <code>useReducer</code> is conceptually identical. It uses the same unidirectional flow: **Component Dispatching Actions $\rightarrow$ Reducer pure function $\rightarrow$ New State**. The only difference is that <code>useReducer</code> is local to a component, whereas NgRx manages global state.</li>
+            <li><strong>Vue (Pinia/Vuex):</strong> Vue's state changes are reactive (mutations directly edit properties). In contrast, React's reducer **must return a brand new object** representing the updated state (immutability).</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="quiz-section">
+        <div class="quiz-title">Interactive Retrieval Practice</div>
+        <div class="quiz-question">
+          What is a strict rule when writing a Reducer function in React?
+        </div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="checkAnswer(this, false, 'Option A')">
+            <span>A:</span> The reducer function should fetch data directly from APIs.
+          </div>
+          <div class="quiz-option" onclick="checkAnswer(this, true, 'Option B')">
+            <span>B:</span> The reducer must be a pure function and return a new state object.
+          </div>
+          <div class="quiz-option" onclick="checkAnswer(this, false, 'Option C')">
+            <span>C:</span> The reducer must mutate the existing state directly for performance.
+          </div>
+        </div>
+        <div id="quiz-feedback-box" class="quiz-feedback"></div>
+      </section>
+
+      <section>
+        <h2>Next Steps</h2>
+        <p>
+          In the dashboard project, we will write a `useReducer` engine to filter and sort 10,000 logs. Next, let's explore how to optimize this rendering process using **Memoization**.
+        </p>
+        <p>
+          <strong>Primary Resource to Explore:</strong> Read the <a href="https://react.dev/reference/react/useReducer" target="_blank" class="nav-link">React Docs on useReducer</a>.
+        </p>
+        <div class="callout">
+          <h4>💡 Teacher Reminder</h4>
+          <p>
+            Do you have questions about action payloads or how to handle asynchronous operations with reducers? Let's discuss it!
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span><a href="0004-project-setup-jsx.html" class="nav-link">← Lesson 4: Project Setup</a></span>
+      <span><a href="../reference/react-foundations.html" class="nav-link">React Reference Sheet →</a></span>
+    </footer>
+  </div>
+
+  <script>
+    function checkAnswer(selectedOption, isCorrect, label) {
+      const options = document.querySelectorAll('.quiz-option');
+      options.forEach(opt => {
+        opt.classList.remove('correct', 'incorrect');
+      });
+
+      const feedbackBox = document.getElementById('quiz-feedback-box');
+      
+      if (isCorrect) {
+        selectedOption.classList.add('correct');
+        feedbackBox.className = 'quiz-feedback success';
+        feedbackBox.innerHTML = '<strong>Correct!</strong> Reducer functions in React must be <em>pure functions</em> (no side effects, no API calls) and must return a new state object instead of mutative edits, enabling React to detect state changes cleanly.';
+      } else {
+        selectedOption.classList.add('incorrect');
+        feedbackBox.className = 'quiz-feedback error';
+        feedbackBox.innerHTML = '<strong>Incorrect.</strong> Reducers cannot contain async API calls, and they must NEVER mutate the state object directly (immutability is a core React rule). Try again!';
+      }
+    }
+  </script>
+</body>
+</html>

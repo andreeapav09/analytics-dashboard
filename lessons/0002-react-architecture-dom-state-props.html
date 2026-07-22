@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 2: React Architecture, DOM vs. Virtual DOM, State & Props</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="lesson-meta">Lesson 2 • React Foundations</div>
+      <h1>React Architecture: Virtual DOM, State, and Props</h1>
+    </header>
+
+    <main>
+      <section>
+        <h2>Bridging the Gap: React vs. Angular vs. Vue</h2>
+        <p>
+          Since you have experience with Angular and Vue, understanding React's core rendering strategy is easiest when compared to what you already know:
+        </p>
+        <ul>
+          <li><strong>Angular:</strong> Uses a dirty-checking mechanism (Zone.js) or fine-grained Signals to intercept data modifications and run change detection, direct DOM updates, and template updates.</li>
+          <li><strong>Vue:</strong> Uses a reactive system (getter/setter interceptors in Vue 2 or Proxies in Vue 3) that tracks dependencies during render. When reactive state changes, Vue knows exactly which component needs to re-render.</li>
+          <li><strong>React:</strong> Relies on an explicit, top-down execution model. When state changes in a component, React re-executes the entire component function (along with all its children, unless optimized) to generate a new Virtual DOM tree.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Real DOM vs. Virtual DOM</h2>
+        <p>
+          The <strong>Real DOM (Document Object Model)</strong> is the browser's internal tree representation of HTML. Modifying the real DOM directly is slow because updates trigger browser reflows (recalculating element positions and sizes) and repaints (drawing pixels on screen).
+        </p>
+        <p>
+          The <strong>Virtual DOM (VDOM)</strong> is a lightweight, in-memory JavaScript representation of the real DOM. When state changes:
+        </p>
+        <ol>
+          <li>React runs the component functions to construct a new VDOM tree.</li>
+          <li>React compares the new VDOM tree with the previous VDOM tree. This comparison process is called <strong>Reconciliation</strong> (powered by the <em>React Fiber</em> engine).</li>
+          <li>React calculates the minimum number of changes required and updates only those specific nodes in the real DOM (called <strong>Commit phase</strong>).</li>
+        </ol>
+      </section>
+
+      <section>
+        <h2>State vs. Props</h2>
+        <p>
+          Data flow in React is strictly <strong>unidirectional</strong> (top-down). The two ways a component handles data are state and props:
+        </p>
+
+        <div class="callout">
+          <h4>State vs. Props Checklist</h4>
+          <ul>
+            <li><strong>State:</strong> Internal, private data owned and managed entirely by the component itself. Can be modified by the component (using state updater functions). Modifying state triggers a re-render.</li>
+            <li><strong>Props:</strong> External data passed down from a parent component. Props are read-only (immutable) to the child component. Changing props triggers a re-render.</li>
+          </ul>
+        </div>
+
+        <h3>comparative Example:</h3>
+        <p>
+          In Angular, you pass data into a child via <code>@Input()</code> and emit events via <code>@Output()</code>. In Vue, you use <code>props</code> and <code>$emit</code>.
+        </p>
+        <p>
+          In React, you pass both values and callback functions down as props:
+        </p>
+        <pre><code>// Parent Component
+function Parent() {
+  const [count, setCount] = useState(0);
+  return &lt;Child counter={count} onIncrement={() => setCount(count + 1)} /&gt;;
+}
+
+// Child Component
+function Child(props) {
+  return (
+    &lt;div&gt;
+      &lt;p&gt;Count is: {props.counter}&lt;/p&gt;
+      &lt;button onClick={props.onIncrement}&gt;Increment&lt;/button&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+      </section>
+
+      <section class="quiz-section">
+        <div class="quiz-title">Interactive Retrieval Practice</div>
+        <div class="quiz-question">
+          What occurs when a React component's props change?
+        </div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="checkAnswer(this, false, 'Option A')">
+            <span>A:</span> The component immediately mutates the props.
+          </div>
+          <div class="quiz-option" onclick="checkAnswer(this, true, 'Option B')">
+            <span>B:</span> The component triggers a re-render cycle.
+          </div>
+          <div class="quiz-option" onclick="checkAnswer(this, false, 'Option C')">
+            <span>C:</span> The component updates the DOM directly.
+          </div>
+        </div>
+        <div id="quiz-feedback-box" class="quiz-feedback"></div>
+      </section>
+
+      <section>
+        <h2>Next Steps</h2>
+        <p>
+          Now that you've got React's foundational mental model, we'll dive into <strong>React Hooks</strong>, exploring how React manages component lifecycles and side effects without class components.
+        </p>
+        <p>
+          <strong>Primary Resource to Explore:</strong> Read the <a href="https://react.dev/learn/rendering-and-committing" target="_blank" class="nav-link">React Docs on Render and Commit</a> to deep-dive into the render phase.
+        </p>
+        <div class="callout">
+          <h4>💡 Teacher Reminder</h4>
+          <p>
+            Got questions about how React's VDOM diffing matches up to Angular's or Vue's approaches? Ask me anything!
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span><a href="0001-agentic-coding-customizations.html" class="nav-link">← Lesson 1: Agentic Coding</a></span>
+      <span><a href="../reference/react-foundations.html" class="nav-link">React Reference Sheet →</a></span>
+    </footer>
+  </div>
+
+  <script>
+    function checkAnswer(selectedOption, isCorrect, label) {
+      const options = document.querySelectorAll('.quiz-option');
+      options.forEach(opt => {
+        opt.classList.remove('correct', 'incorrect');
+      });
+
+      const feedbackBox = document.getElementById('quiz-feedback-box');
+      
+      if (isCorrect) {
+        selectedOption.classList.add('correct');
+        feedbackBox.className = 'quiz-feedback success';
+        feedbackBox.innerHTML = '<strong>Correct!</strong> When props (or state) change, React triggers a component re-render. It executes the function to calculate the new virtual tree.';
+      } else {
+        selectedOption.classList.add('incorrect');
+        feedbackBox.className = 'quiz-feedback error';
+        feedbackBox.innerHTML = '<strong>Incorrect.</strong> Remember: Props are read-only and cannot be mutated by the child. Their alteration triggers a re-render.';
+      }
+    }
+  </script>
+</body>
+</html>

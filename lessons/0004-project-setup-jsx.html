@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 4: Project Setup & JSX Fundamentals</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="lesson-meta">Lesson 4 • Project Initialization</div>
+      <h1>Project Setup and JSX Fundamentals</h1>
+    </header>
+
+    <main>
+      <section>
+        <h2>Why Vite instead of Create React App?</h2>
+        <p>
+          In modern React development, we use <strong>Vite</strong> to initialize projects rather than the older, deprecated <code>create-react-app</code> (CRA).
+        </p>
+        <ul>
+          <li><strong>Speed:</strong> Vite uses native ES Modules in the browser and compiles assets with Esbuild (written in Go), making development servers start almost instantly.</li>
+          <li><strong>Flexibility:</strong> Vite is lightweight and highly configurable, unlike CRA which hides complex Webpack configs behind a rigid structure.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>What is JSX?</h2>
+        <p>
+          <strong>JSX</strong> (JavaScript XML) is a syntax extension for JavaScript. It looks like HTML, but it compiles down to regular JavaScript function calls.
+        </p>
+        <p>
+          For example, when you write this JSX:
+        </p>
+        <pre><code>const element = &lt;h1 className="title"&gt;Hello World&lt;/h1&gt;;</code></pre>
+        <p>
+          Under the hood, the compiler converts it to a standard JavaScript function call that returns a Virtual DOM node:
+        </p>
+        <pre><code>// React 17+ Compiler Output
+import { jsx as _jsx } from 'react/jsx-runtime';
+const element = _jsx('h1', { className: 'title', children: 'Hello World' });</code></pre>
+        <p>
+          Because JSX is actually JavaScript, it gives you the full power of JavaScript loops, conditionals, and variables directly inside your markup.
+        </p>
+      </section>
+
+      <section>
+        <h2>The Strict Rules of JSX</h2>
+        <p>
+          Because JSX compiles to JavaScript objects, it has strict grammatical rules that differ from standard HTML:
+        </p>
+        <ol>
+          <li><strong>Return a Single Root Element:</strong> You cannot return multiple adjacent tags. They must be wrapped in a single parent tag (like a <code>&lt;div&gt;</code>) or a React Fragment (<code>&lt;&gt;...&lt;/&gt;</code>).</li>
+          <li><strong>Close All Tags:</strong> Every tag must be explicitly closed. Self-closing tags must end with a slash: <code>&lt;img /&gt;</code>, <code>&lt;br /&gt;</code>, or <code>&lt;input /&gt;</code>.</li>
+          <li><strong>camelCase Naming for Attributes:</strong> JSX attributes map directly to JavaScript DOM properties. Therefore, class is written as <code>className</code>, and inline styles are written as objects: <code>style={{ color: 'red' }}</code>.</li>
+        </ol>
+      </section>
+
+      <section class="assignment-section">
+        <h2>🛠️ Hands-on Assignment: Start the Project</h2>
+        <p>
+          We are going to build a <strong>Developer Productivity Dashboard</strong> (Kanban Board + Pomodoro Timer). Your first step is to initialize the Vite project.
+        </p>
+        <div class="callout">
+          <h4>Your Task:</h4>
+          <p>
+            1. Open your terminal in the workspace root: <code>d:\learning_project</code>.<br>
+            2. Run the initialization command: <br>
+            <code>npm create vite@latest dev-dashboard -- --template react</code><br>
+            3. Follow the CLI prompts to complete setup, navigate into the directory (<code>cd dev-dashboard</code>), and install dependencies (<code>npm install</code>).
+          </p>
+        </div>
+      </section>
+
+      <section class="quiz-section">
+        <div class="quiz-title">Interactive Retrieval Practice</div>
+        <div class="quiz-question">
+          Why must we use `className` instead of `class` in JSX?
+        </div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="checkAnswer(this, true, 'Option A')">
+            <span>A:</span> `class` is a reserved keyword in JavaScript.
+          </div>
+          <div class="quiz-option" onclick="checkAnswer(this, false, 'Option B')">
+            <span>B:</span> JSX requires XML attributes to be longer.
+          </div>
+          <div class="quiz-option" onclick="checkAnswer(this, false, 'Option C')">
+            <span>C:</span> Using `className` makes the rendering faster.
+          </div>
+        </div>
+        <div id="quiz-feedback-box" class="quiz-feedback"></div>
+      </section>
+
+      <section>
+        <h2>Next Steps</h2>
+        <p>
+          Once you have created the directory and installed the packages, we will create our first core components using props and children.
+        </p>
+        <p>
+          <strong>Primary Resource to Explore:</strong> Read the <a href="https://react.dev/learn/writing-markup-with-jsx" target="_blank" class="nav-link">React Docs on JSX Rules</a>.
+        </p>
+        <div class="callout">
+          <h4>💡 Teacher Reminder</h4>
+          <p>
+            Please let me know if you run into any dependency issues or npm errors when initializing the Vite app!
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span><a href="0003-react-hooks-basics.html" class="nav-link">← Lesson 3: Core Hooks</a></span>
+      <span><a href="../reference/react-foundations.html" class="nav-link">React Reference Sheet →</a></span>
+    </footer>
+  </div>
+
+  <script>
+    function checkAnswer(selectedOption, isCorrect, label) {
+      const options = document.querySelectorAll('.quiz-option');
+      options.forEach(opt => {
+        opt.classList.remove('correct', 'incorrect');
+      });
+
+      const feedbackBox = document.getElementById('quiz-feedback-box');
+      
+      if (isCorrect) {
+        selectedOption.classList.add('correct');
+        feedbackBox.className = 'quiz-feedback success';
+        feedbackBox.innerHTML = '<strong>Correct!</strong> Since JSX compiles into plain JavaScript objects, and <code>class</code> is a reserved keyword in JavaScript (used for defining class components/objects), React uses <code>className</code> instead.';
+      } else {
+        selectedOption.classList.add('incorrect');
+        feedbackBox.className = 'quiz-feedback error';
+        feedbackBox.innerHTML = '<strong>Incorrect.</strong> Remember: JSX translates into JavaScript function calls. In JavaScript, <code>class</code> is already a reserved keyword.';
+      }
+    }
+  </script>
+</body>
+</html>

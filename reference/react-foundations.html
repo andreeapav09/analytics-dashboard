@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reference: React Foundations & Virtual DOM</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    @media print {
+      body { background: white; color: black; padding: 0; }
+      .container { max-width: 100%; padding: 0; }
+      .no-print { display: none; }
+    }
+    
+    .ref-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    
+    @media (max-width: 768px) {
+      .ref-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .ref-card {
+      background-color: var(--code-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.2rem;
+    }
+
+    .ref-card h3 {
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.3rem;
+      color: var(--accent-color);
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+
+    .comparison-table th, .comparison-table td {
+      border: 1px solid var(--border-color);
+      padding: 0.8rem;
+      text-align: left;
+      font-size: 1rem;
+    }
+
+    .comparison-table th {
+      background-color: var(--code-bg);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="lesson-meta">Cheat Sheet / Reference</div>
+      <h1>React Foundations Reference</h1>
+    </header>
+
+    <main>
+      <section>
+        <h2>Reconciliation & Fiber Engine</h2>
+        <p>
+          React uses an internal reconciliation engine called <strong>React Fiber</strong>. Fiber allows React to split rendering work into incremental chunks, pause work, and resume it later. This keeps the browser main thread responsive during heavy updates.
+        </p>
+      </section>
+
+      <div class="ref-grid">
+        <div class="ref-card">
+          <h3>State vs. Props</h3>
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>Feature</th>
+                <th>State</th>
+                <th>Props</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Owner</td>
+                <td>Component itself</td>
+                <td>Parent component</td>
+              </tr>
+              <tr>
+                <td>Mutability</td>
+                <td>Mutable (via updater)</td>
+                <td>Immutable (Read-Only)</td>
+              </tr>
+              <tr>
+                <td>Trigger Re-render</td>
+                <td>Yes</td>
+                <td>Yes</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="ref-card">
+          <h3>Framework Concepts Map</h3>
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>Concept</th>
+                <th>React</th>
+                <th>Angular</th>
+                <th>Vue</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Passing In</td>
+                <td>Props</td>
+                <td><code>@Input()</code></td>
+                <td>Props</td>
+              </tr>
+              <tr>
+                <td>Passing Out</td>
+                <td>Callback props</td>
+                <td><code>@Output()</code></td>
+                <td><code>$emit</code></td>
+              </tr>
+              <tr>
+                <td>Update Strategy</td>
+                <td>Virtual DOM diff</td>
+                <td>Zone.js / Signals</td>
+                <td>Proxy-based tracking</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <section>
+        <h2>Rules of JSX</h2>
+        <ol>
+          <li><strong>Return a single root element:</strong> Wrap content in a parent element or a Fragment (<code>&lt;&gt;...&lt;/&gt;</code>).</li>
+          <li><strong>Close all tags:</strong> Every tag must be explicitly closed (e.g., <code>&lt;br /&gt;</code>, <code>&lt;input /&gt;</code>).</li>
+          <li><strong>camelCase everything:</strong> Use camelCase for attributes (e.g., <code>className</code> instead of <code>class</code>, <code>onClick</code> instead of <code>onclick</code>).</li>
+        </ol>
+      </section>
+    </main>
+
+    <footer class="no-print">
+      <span><a href="../lessons/0002-react-architecture-dom-state-props.html" class="nav-link">← Lesson 2</a></span>
+      <span><a href="../MISSION.md" class="nav-link">Mission Page →</a></span>
+    </footer>
+  </div>
+</body>
+</html>
