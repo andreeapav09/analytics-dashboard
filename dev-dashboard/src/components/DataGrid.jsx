@@ -226,41 +226,48 @@ const styles = {
   },
   controlsBar: {
     display: 'flex',
-    flexWrap: 'wrap',
-    gap: '1rem',
+    flexDirection: 'row',
+    flexWrap: 'nowrap',
+    gap: '0.75rem',
     marginBottom: '1rem',
-    alignItems: 'center'
+    alignItems: 'center',
+    width: '100%',
+    boxSizing: 'border-box'
   },
   searchBox: {
-    flex: '1 1 250px'
+    flex: '1 1 auto',
+    minWidth: '180px'
   },
   searchInput: {
     width: '100%',
-    padding: '0.5rem 0.8rem',
+    boxSizing: 'border-box',
+    padding: '0.45rem 0.7rem',
     borderRadius: '4px',
     border: '1px solid #3f3f46',
     backgroundColor: '#18181b',
     color: '#ffffff',
-    fontSize: '0.9rem',
+    fontSize: '0.85rem',
     outline: 'none'
   },
   filterGroup: {
     display: 'flex',
     alignItems: 'center',
-    gap: '0.4rem'
+    gap: '0.35rem',
+    flexShrink: 0,
+    whiteSpace: 'nowrap'
   },
   label: {
-    fontSize: '0.85rem',
+    fontSize: '0.8rem',
     color: '#a1a1aa',
     fontWeight: '500'
   },
   select: {
-    padding: '0.5rem 0.7rem',
+    padding: '0.45rem 0.6rem',
     borderRadius: '4px',
     border: '1px solid #3f3f46',
     backgroundColor: '#18181b',
     color: '#ffffff',
-    fontSize: '0.85rem',
+    fontSize: '0.8rem',
     outline: 'none',
     cursor: 'pointer'
   },
