@@ -4,22 +4,26 @@ import { generateInitialLogs } from './utils/mockData';
 import PerformanceMonitor from './components/PerformanceMonitor';
 import LiveMetricPoller from './components/LiveMetricPoller';
 import DataGrid from './components/DataGrid';
+import { useTheme } from './context/ThemeContext';
 
 // 1. LAZY LOADING: Dynamically import LazyChart bundle chunk
 const LazyChart = lazy(() => import('./components/LazyChart'));
 
 export default function App() {
-  // Sub-Step B: Initialize useReducer state engine
+  // Global Theme Context Hook (useContext)
+  const { theme, toggleTheme } = useTheme(); // custom hook
+
+  // Initialize useReducer state engine
   const [state, dispatch] = useReducer(dashboardReducer, initialState);
 
-  // Sub-Step C: Load initial 10,000 logs on initial mount
+  // Load initial 10,000 logs on mount
   useEffect(() => {
     console.log('Generating initial 10,000 metric logs...');
     const initialLogs = generateInitialLogs(10000);
     dispatch({ type: 'SET_INITIAL_LOGS', payload: initialLogs });
   }, []);
 
-  // Sub-Step D: Dispatch Handlers (Memoized with useCallback for reference stability)
+  // Dispatch Handlers (Memoized with useCallback for reference stability)
   const handleNewLog = useCallback((newLog) => {
     dispatch({ type: 'ADD_LOG', payload: newLog });
   }, []);
@@ -44,34 +48,50 @@ export default function App() {
     dispatch({ type: 'SET_SORT_DIRECTION', payload: sortDir });
   }, []);
 
-  // Sub-Step E: Component Composition & Layout
+  // Dynamic Theme Styles
+  const containerStyle = {
+    ...styles.appContainer,
+    backgroundColor: theme === 'dark' ? '#121214' : '#f4f4f8',
+    color: theme === 'dark' ? '#e3e3e6' : '#18181b'
+  };
+
+  const titleStyle = {
+    ...styles.title,
+    color: theme === 'dark' ? '#ffffff' : '#09090b'
+  };
+
   return (
-    <div style={styles.appContainer}>
+    <div style={containerStyle}>
       <header style={styles.header}>
         <div>
-          <h1 style={styles.title}>⚡ MetricsStream Dashboard</h1>
+          <h1 style={titleStyle}>⚡ MetricsStream Dashboard</h1>
           <p style={styles.subtitle}>
             High-Performance React Data Analytics Engine (10,000+ Records)
           </p>
         </div>
+
+        {/* Global Context Consumer Button (useContext) */}
+        <button onClick={toggleTheme} style={styles.themeToggleBtn}>
+          {theme === 'dark' ? '☀️ Switch to Light Mode' : '🌙 Switch to Dark Mode'}
+        </button>
       </header>
 
       {/* Widget 1: Performance Render Counter */}
-      <PerformanceMonitor 
+      <PerformanceMonitor
         totalLogsCount={state.logs.length}
         filteredLogsCount={state.logs.length}
         isPollingActive={state.isPollingActive}
       />
 
-      {/* Widget 2: Live Poller (useEffect + useRef + Cleanup) */}
-      <LiveMetricPoller 
+      {/* Widget 2: Live Poller */}
+      <LiveMetricPoller
         isPollingActive={state.isPollingActive}
         onNewLog={handleNewLog}
         onTogglePolling={handleTogglePolling}
       />
 
-      {/* Widget 3: Data Grid with Pagination (useMemo + React.memo + useCallback) */}
-      <DataGrid 
+      {/* Widget 3: Data Grid with Pagination */}
+      <DataGrid
         logs={state.logs}
         searchQuery={state.searchQuery}
         selectedLevel={state.selectedLevel}
@@ -82,7 +102,7 @@ export default function App() {
         onSortChange={handleSortChange}
       />
 
-      {/* Widget 4: Lazy Loaded Component (React.lazy + Suspense) */}
+      {/* Widget 4: Lazy Loaded Component */}
       <Suspense fallback={<div style={styles.suspenseLoader}>Loading Chart Bundle Chunk...</div>}>
         <LazyChart logs={state.logs} />
       </Suspense>
@@ -96,11 +116,13 @@ const styles = {
     margin: '0 auto',
     padding: '2rem 1.5rem',
     fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
-    backgroundColor: '#121214',
     minHeight: '100vh',
-    color: '#e3e3e6'
+    transition: 'background-color 0.3s ease, color 0.3s ease'
   },
   header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: '1.5rem',
     borderBottom: '1px solid #27272a',
     paddingBottom: '1rem'
@@ -108,13 +130,22 @@ const styles = {
   title: {
     fontSize: '1.8rem',
     fontWeight: '700',
-    color: '#ffffff',
     margin: 0
   },
   subtitle: {
     fontSize: '0.9rem',
     color: '#a1a1aa',
     marginTop: '0.3rem'
+  },
+  themeToggleBtn: {
+    backgroundColor: '#3f3f46',
+    color: '#ffffff',
+    border: 'none',
+    padding: '0.5rem 1rem',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    fontWeight: '600',
+    fontSize: '0.85rem'
   },
   suspenseLoader: {
     backgroundColor: '#1e1e24',
