@@ -1,4 +1,4 @@
-// Mock Data Generator for High-Volume Server Metrics
+// Mock Data Generator for High-Volume Server Metrics and Logs
 
 const SOURCES = ['Database', 'AuthService', 'Gateway', 'PaymentService', 'CacheNode', 'WorkerPool'];
 const LEVELS = ['info', 'warn', 'error'];
@@ -28,14 +28,14 @@ const MESSAGES = {
 };
 
 /**
- * Generates a single metric log object
+ * Generates a single metric log object (used during live polling ticks)
  */
 export function generateSingleLog(index = Date.now()) {
   const level = LEVELS[Math.floor(Math.random() * LEVELS.length)];
   const source = SOURCES[Math.floor(Math.random() * SOURCES.length)];
   const messageList = MESSAGES[level];
   const message = messageList[Math.floor(Math.random() * messageList.length)];
-  
+
   // Random latency between 5ms and 850ms
   const latency = Math.floor(Math.random() * 845) + 5;
 
@@ -51,12 +51,12 @@ export function generateSingleLog(index = Date.now()) {
 }
 
 /**
- * Generates an array of N metric logs (default 10,000)
+ * Generates an array of N metric logs (default 10,000 for high-volume testing)
  */
 export function generateInitialLogs(count = 10000) {
   const logs = [];
   const now = Date.now();
-  
+
   for (let i = 0; i < count; i++) {
     // Stagger timestamps slightly for realism
     const timeOffset = (count - i) * 100;

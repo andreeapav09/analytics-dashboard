@@ -2,13 +2,13 @@ import React, { useRef } from 'react';
 
 /**
  * PerformanceMonitor Widget
- * Uses a ref to visually count total component renders without causing re-renders itself!
+ * Demonstrates using a ref to visually count component renders without causing infinite re-render loops!
  */
 export default function PerformanceMonitor({ totalLogsCount, filteredLogsCount, isPollingActive }) {
-  // Use a ref to count how many times this component renders
-  const renderCountRef = useRef(1);
+  // Use a ref to count how many times this header component renders (starts at 0)
+  const renderCountRef = useRef(0);
   
-  // Mutate ref on each render pass
+  // Mutate ref silently on each render pass
   renderCountRef.current += 1;
 
   return (
@@ -52,7 +52,7 @@ const styles = {
     marginBottom: '1.5rem',
     boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
     alignItems: 'center',
-    justifycss: 'space-between'
+    justifyContent: 'space-between'
   },
   statBox: {
     display: 'flex',

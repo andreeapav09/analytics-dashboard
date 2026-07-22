@@ -9,17 +9,17 @@ import DataGrid from './components/DataGrid';
 const LazyChart = lazy(() => import('./components/LazyChart'));
 
 export default function App() {
-  // 2. USEREDUCER: Initialize complex state engine
+  // Sub-Step B: Initialize useReducer state engine
   const [state, dispatch] = useReducer(dashboardReducer, initialState);
 
-  // Load 10,000 logs on initial mount
+  // Sub-Step C: Load initial 10,000 logs on initial mount
   useEffect(() => {
     console.log('Generating initial 10,000 metric logs...');
     const initialLogs = generateInitialLogs(10000);
     dispatch({ type: 'SET_INITIAL_LOGS', payload: initialLogs });
   }, []);
 
-  // Dispatch Handlers (Memoized with useCallback for reference stability)
+  // Sub-Step D: Dispatch Handlers (Memoized with useCallback for reference stability)
   const handleNewLog = useCallback((newLog) => {
     dispatch({ type: 'ADD_LOG', payload: newLog });
   }, []);
@@ -44,6 +44,7 @@ export default function App() {
     dispatch({ type: 'SET_SORT_DIRECTION', payload: sortDir });
   }, []);
 
+  // Sub-Step E: Component Composition & Layout
   return (
     <div style={styles.appContainer}>
       <header style={styles.header}>
@@ -69,7 +70,7 @@ export default function App() {
         onTogglePolling={handleTogglePolling}
       />
 
-      {/* Widget 3: Data Grid (useMemo + React.memo + useCallback) */}
+      {/* Widget 3: Data Grid with Pagination (useMemo + React.memo + useCallback) */}
       <DataGrid 
         logs={state.logs}
         searchQuery={state.searchQuery}

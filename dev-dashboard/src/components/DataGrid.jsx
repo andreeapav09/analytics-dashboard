@@ -1,12 +1,12 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import LogRow from './LogRow';
 
 /**
- * DataGrid Component (High Performance List)
+ * DataGrid Component (High Performance List with Local Pagination State)
  * Demonstrates:
- * 1. useMemo: Caches the filtered and sorted 10,000 logs so expensive loops don't run on every render pass.
- * 2. useCallback: Caches the handleToggleFlag callback function reference so React.memo on LogRow works properly.
- * 3. key prop: Uses log.id (unique identifier) for reconciliation performance.
+ * 1. useMemo: Caches filtered/sorted logs across 10,000 items and computes paginated slice.
+ * 2. useCallback: Caches handleToggleFlag callback for LogRow React.memo performance.
+ * 3. useState: Local component state for currentPage and pageSize.
  */
 export default function DataGrid({ 
   logs, 
@@ -18,12 +18,13 @@ export default function DataGrid({
   onLevelChange,
   onSortChange
 }) {
+  // Local UI State for Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
 
-  // 1. USEMEMO: Filter and Sort 10,000 items ONLY when relevant dependencies change!
+  // 1. USEMEMO: Filter and Sort 10,000 items ONLY when dependencies change
   const processedLogs = useMemo(() => {
     const startTime = performance.now();
-    console.log(`[useMemo] Calculating filtered/sorted logs across ${logs.length} items...`);
-
     let result = logs;
 
     // Filter by Level
@@ -41,7 +42,7 @@ export default function DataGrid({
       );
     }
 
-    // Sort by Latency
+    // Sort by Latency (Strict Immutability with Shallow Copy [...result])
     if (sortDirection !== 'none') {
       result = [...result].sort((a, b) => {
         return sortDirection === 'desc' 
@@ -51,12 +52,38 @@ export default function DataGrid({
     }
 
     const duration = (performance.now() - startTime).toFixed(2);
-    console.log(`[useMemo] Completed filtering ${result.length} items in ${duration}ms`);
+    console.log(`[useMemo] Filtered & sorted ${result.length} items in ${duration}ms`);
 
     return result;
   }, [logs, searchQuery, selectedLevel, sortDirection]);
 
-  // 2. USECALLBACK: Lock down memory reference for action callback passed to LogRow
+  // Calculate Pagination bounds safely
+  const totalPages = Math.ceil(processedLogs.length / pageSize) || 1;
+  const safePage = Math.min(currentPage, totalPages);
+
+  // 2. USEMEMO: Slice the active page items efficiently
+  const paginatedLogs = useMemo(() => {
+    const startIndex = (safePage - 1) * pageSize;
+    return processedLogs.slice(startIndex, startIndex + pageSize);
+  }, [processedLogs, safePage, pageSize]);
+
+  // Reset to page 1 when search or filter values change
+  const handleSearchInputChange = (value) => {
+    setCurrentPage(1);
+    onSearchChange(value);
+  };
+
+  const handleLevelSelectChange = (value) => {
+    setCurrentPage(1);
+    onLevelChange(value);
+  };
+
+  const handlePageSizeSelectChange = (size) => {
+    setPageSize(Number(size));
+    setCurrentPage(1);
+  };
+
+  // 3. USECALLBACK: Lock down memory reference for LogRow callback
   const handleToggleFlagCallback = useCallback((id) => {
     onToggleFlag(id);
   }, [onToggleFlag]);
@@ -70,7 +97,7 @@ export default function DataGrid({
             type="text"
             placeholder="Search logs by message, source, or ID..."
             value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
+            onChange={(e) => handleSearchInputChange(e.target.value)}
             style={styles.searchInput}
           />
         </div>
@@ -79,7 +106,7 @@ export default function DataGrid({
           <label style={styles.label}>Level:</label>
           <select 
             value={selectedLevel} 
-            onChange={(e) => onLevelChange(e.target.value)}
+            onChange={(e) => handleLevelSelectChange(e.target.value)}
             style={styles.select}
           >
             <option value="all">All Levels</option>
@@ -101,6 +128,20 @@ export default function DataGrid({
             <option value="asc">Lowest First (Fastest)</option>
           </select>
         </div>
+
+        <div style={styles.filterGroup}>
+          <label style={styles.label}>Page Size:</label>
+          <select 
+            value={pageSize} 
+            onChange={(e) => handlePageSizeSelectChange(e.target.value)}
+            style={styles.select}
+          >
+            <option value={10}>10 per page</option>
+            <option value={25}>25 per page</option>
+            <option value={50}>50 per page</option>
+            <option value={100}>100 per page</option>
+          </select>
+        </div>
       </div>
 
       {/* Grid Headers */}
@@ -116,25 +157,61 @@ export default function DataGrid({
 
       {/* Log List Rendering */}
       <div style={styles.listContainer}>
-        {processedLogs.length === 0 ? (
+        {paginatedLogs.length === 0 ? (
           <div style={styles.emptyState}>No matching logs found.</div>
         ) : (
-          // Display up to 100 visible items for DOM rendering performance, while processing 10,000
-          processedLogs.slice(0, 100).map(log => (
+          paginatedLogs.map(log => (
             <LogRow 
-              key={log.id} // Unique Key Prop for Fiber Reconciliation
+              key={log.id} 
               log={log} 
-              onToggleFlag={handleToggleFlagCallback} // Memoized callback
+              onToggleFlag={handleToggleFlagCallback} 
             />
           ))
         )}
       </div>
       
-      {processedLogs.length > 100 && (
-        <div style={styles.footerNote}>
-          Showing top 100 of {processedLogs.length.toLocaleString()} matching logs (DOM slice windowing).
+      {/* Pagination Footer Controls */}
+      <div style={styles.paginationBar}>
+        <div style={styles.pageStats}>
+          Showing <strong>{processedLogs.length === 0 ? 0 : (safePage - 1) * pageSize + 1}</strong> to <strong>{Math.min(safePage * pageSize, processedLogs.length)}</strong> of <strong>{processedLogs.length.toLocaleString()}</strong> logs
         </div>
-      )}
+
+        <div style={styles.pageButtons}>
+          <button 
+            disabled={safePage <= 1} 
+            onClick={() => setCurrentPage(1)}
+            style={{ ...styles.pageBtn, opacity: safePage <= 1 ? 0.4 : 1 }}
+          >
+            « First
+          </button>
+          <button 
+            disabled={safePage <= 1} 
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            style={{ ...styles.pageBtn, opacity: safePage <= 1 ? 0.4 : 1 }}
+          >
+            ‹ Prev
+          </button>
+
+          <span style={styles.pageIndicator}>
+            Page {safePage} of {totalPages}
+          </span>
+
+          <button 
+            disabled={safePage >= totalPages} 
+            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            style={{ ...styles.pageBtn, opacity: safePage >= totalPages ? 0.4 : 1 }}
+          >
+            Next ›
+          </button>
+          <button 
+            disabled={safePage >= totalPages} 
+            onClick={() => setCurrentPage(totalPages)}
+            style={{ ...styles.pageBtn, opacity: safePage >= totalPages ? 0.4 : 1 }}
+          >
+            Last »
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -202,6 +279,7 @@ const styles = {
     marginBottom: '0.5rem'
   },
   listContainer: {
+    minHeight: '280px',
     maxHeight: '520px',
     overflowY: 'auto'
   },
@@ -210,10 +288,39 @@ const styles = {
     textAlign: 'center',
     color: '#71717a'
   },
-  footerNote: {
-    marginTop: '0.75rem',
-    textAlign: 'center',
+  paginationBar: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: '1rem',
+    paddingTop: '0.8rem',
+    borderTop: '1px solid #27272a',
+    gap: '1rem'
+  },
+  pageStats: {
+    fontSize: '0.85rem',
+    color: '#a1a1aa'
+  },
+  pageButtons: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem'
+  },
+  pageBtn: {
+    backgroundColor: '#27272a',
+    border: '1px solid #3f3f46',
+    color: '#ffffff',
+    padding: '0.35rem 0.7rem',
+    borderRadius: '4px',
+    cursor: 'pointer',
     fontSize: '0.8rem',
-    color: '#71717a'
+    fontWeight: '500'
+  },
+  pageIndicator: {
+    fontSize: '0.85rem',
+    color: '#e4e4e7',
+    fontWeight: '600',
+    padding: '0 0.4rem'
   }
 };

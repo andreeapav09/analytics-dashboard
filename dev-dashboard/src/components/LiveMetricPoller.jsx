@@ -23,7 +23,7 @@ export default function LiveMetricPoller({ isPollingActive, onNewLog, onTogglePo
       }, 2000); // Generate new metric every 2 seconds
     }
 
-    // CLEANUP FUNCTION: Runs when isPollingActive changes or component unmounts
+    // CLEANUP FUNCTION: Runs when isPollingActive/onNewLog changes or component unmounts
     return () => {
       if (intervalIdRef.current) {
         console.log('Cleaning up polling timer ID:', intervalIdRef.current);

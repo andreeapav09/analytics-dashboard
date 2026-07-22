@@ -8,8 +8,8 @@ import React, { useRef } from 'react';
  * 3. useRef to track row render passes visually
  */
 const LogRow = React.memo(function LogRow({ log, onToggleFlag }) {
-  // Use a ref to count how many times THIS specific row rendered
-  const rowRenderCountRef = useRef(1);
+  // Use a ref to count how many times THIS specific row rendered (starts at 0)
+  const rowRenderCountRef = useRef(0);
   rowRenderCountRef.current += 1;
 
   const levelColors = {
