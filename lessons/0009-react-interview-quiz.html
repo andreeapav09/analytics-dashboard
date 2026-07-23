@@ -497,6 +497,14 @@
       }
     ];
 
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
     function renderQuiz() {
       const container = document.getElementById('quiz-container');
       container.innerHTML = '';
@@ -509,14 +517,14 @@
         const optionsHtml = q.options.map((opt, i) => `
           <label class="option-label" id="label-${q.id}-${i}">
             <input type="radio" name="question-${q.id}" value="${i}">
-            <span>${String.fromCharCode(65 + i)}. ${opt}</span>
+            <span>${String.fromCharCode(65 + i)}. ${escapeHtml(opt)}</span>
           </label>
         `).join('');
 
         card.innerHTML = `
           <div class="question-title">
             <span class="question-number">Q${q.id}.</span>
-            <span>${q.question}</span>
+            <span>${escapeHtml(q.question)}</span>
           </div>
           <div class="options-list">
             ${optionsHtml}
@@ -558,10 +566,10 @@
 
       if (selectedValue === q.correct) {
         feedback.className = 'feedback-box feedback-correct';
-        feedback.innerHTML = `<strong> Correct!</strong><br>${q.explanation}`;
+        feedback.innerHTML = `<strong> Correct!</strong><br>${escapeHtml(q.explanation)}`;
       } else {
         feedback.className = 'feedback-box feedback-incorrect';
-        feedback.innerHTML = `<strong>❌ Incorrect.</strong> Correct answer is <strong>${String.fromCharCode(65 + q.correct)}</strong>.<br>${q.explanation}`;
+        feedback.innerHTML = `<strong>❌ Incorrect.</strong> Correct answer is <strong>${String.fromCharCode(65 + q.correct)}</strong>.<br>${escapeHtml(q.explanation)}`;
       }
 
       updateTotalScore();
