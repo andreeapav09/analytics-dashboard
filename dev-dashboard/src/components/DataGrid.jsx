@@ -16,11 +16,17 @@ export default function DataGrid({
   onToggleFlag,
   onSearchChange,
   onLevelChange,
-  onSortChange
+  onSortChange,
+  onResetFilters
 }) {
   // Local UI State for Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
+
+  const handleResetAllFilters = () => {
+    setCurrentPage(1);
+    onResetFilters();
+  };
 
   // 1. USEMEMO: Filter and Sort 10,000 items ONLY when dependencies change
   const processedLogs = useMemo(() => {
@@ -142,6 +148,14 @@ export default function DataGrid({
             <option value={100}>100 per page</option>
           </select>
         </div>
+
+        <button 
+          onClick={handleResetAllFilters} 
+          style={styles.resetBtn}
+          title="Reset search query, level filter, and sort direction in 1 atomic pass"
+        >
+          ↺ Reset Filters
+        </button>
       </div>
 
       {/* Grid Headers */}
@@ -329,5 +343,17 @@ const styles = {
     color: '#e4e4e7',
     fontWeight: '600',
     padding: '0 0.4rem'
+  },
+  resetBtn: {
+    backgroundColor: '#3f3f46',
+    color: '#ffffff',
+    border: '1px solid #52525b',
+    padding: '0.45rem 0.7rem',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontSize: '0.8rem',
+    fontWeight: '600',
+    whiteSpace: 'nowrap',
+    flexShrink: 0
   }
 };

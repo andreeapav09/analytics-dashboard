@@ -130,3 +130,10 @@ If we had forgotten the cleanup function, clicking Pause/Resume 5 times would le
 That is caused by <React.StrictMode>. In development, React intentionally double-invokes render functions and effects (to make sure the functions are pure) to help developers catch impure side-effects and cleanup bugs. In production builds, Strict Mode double-invocations are automatically removed.
 6. **What is the complete performance optimization strategy for rendering 10,000+ streaming data records in React?**
 Use `useReducer` for state, `useMemo` for filtering/sorting, `React.memo` & `useCallback` for row stability, viewport pagination slicing, and `React.lazy` for heavy modules.
+7. **How do you handle 50,000+ real-time records in a React application?**
+In web applications, the main performance bottleneck is almost never JavaScript memory calculations, but Real DOM node rendering. I handle high volume by decoupling data processing from DOM rendering:
+- Use useMemo to filter and sort large datasets in memory (which V8 computes in under 5ms).
+- Use Viewport Slicing / Pagination to limit the active Real DOM nodes to a small visible window (e.g., 25 items).
+- Use React.memo and useCallback to isolate component render boundaries so streaming state updates don't trigger unnecessary row re-renders."
+8. **Why to use useReducer instead of many useStates?**
+The main reason to use useReducer is clean code architecture and testability. But performance-wise, it allows (atomic state transitions) to update multiple state properties in a single dispatch pass so React performs only 1 re-render instead of multiple passes.

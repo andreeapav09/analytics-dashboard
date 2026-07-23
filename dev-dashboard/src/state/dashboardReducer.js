@@ -83,6 +83,15 @@ export function dashboardReducer(state, action) {
         logs: []
       };
 
+    case 'RESET_ALL_FILTERS':
+      // Atomic multi-property update: resets search, level, and sort in ONE single pass!
+      return {
+        ...state,
+        searchQuery: '',
+        selectedLevel: 'all',
+        sortDirection: 'none'
+      };
+
     default:
       return state;
   }

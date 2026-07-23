@@ -48,6 +48,10 @@ export default function App() {
     dispatch({ type: 'SET_SORT_DIRECTION', payload: sortDir });
   }, []);
 
+  const handleResetFilters = useCallback(() => {
+    dispatch({ type: 'RESET_ALL_FILTERS' });
+  }, []);
+
   const handleBatchSizeChange = useCallback((size) => {
     dispatch({ type: 'SET_BATCH_SIZE', payload: size });
   }, []);
@@ -120,6 +124,7 @@ export default function App() {
         onSearchChange={handleSearchChange}
         onLevelChange={handleLevelChange}
         onSortChange={handleSortChange}
+        onResetFilters={handleResetFilters}
       />
 
       {/* Widget 4: Lazy Loaded Component */}
