@@ -1,12 +1,14 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import LogRow from './LogRow';
+import { useTheme } from '../context/ThemeContext';
 
 /**
  * DataGrid Component (High Performance List with Local Pagination State)
  * Demonstrates:
- * 1. useMemo: Caches filtered/sorted logs across 10,000 items and computes paginated slice.
- * 2. useCallback: Caches handleToggleFlag callback for LogRow React.memo performance.
- * 3. useState: Local component state for currentPage and pageSize.
+ * 1. useContext: Reads global Theme directly from ThemeProvider.
+ * 2. useMemo: Caches filtered/sorted logs across 10,000 items and computes paginated slice.
+ * 3. useCallback: Caches handleToggleFlag callback for LogRow React.memo performance.
+ * 4. useState: Local component state for currentPage and pageSize.
  */
 export default function DataGrid({ 
   logs, 
@@ -19,6 +21,9 @@ export default function DataGrid({
   onSortChange,
   onResetFilters
 }) {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
   // Local UI State for Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
@@ -94,8 +99,55 @@ export default function DataGrid({
     onToggleFlag(id);
   }, [onToggleFlag]);
 
+  const containerStyle = {
+    ...styles.container,
+    backgroundColor: isDark ? '#1e1e24' : '#ffffff',
+    color: isDark ? '#e3e3e6' : '#18181b',
+    border: isDark ? '1px solid #27272a' : '1px solid #e4e4e7',
+    boxShadow: isDark ? '0 4px 12px rgba(0,0,0,0.15)' : '0 4px 12px rgba(0,0,0,0.05)'
+  };
+
+  const inputStyle = {
+    ...styles.searchInput,
+    backgroundColor: isDark ? '#18181b' : '#f4f4f8',
+    color: isDark ? '#ffffff' : '#09090b',
+    border: isDark ? '1px solid #3f3f46' : '1px solid #d4d4d8'
+  };
+
+  const selectStyle = {
+    ...styles.select,
+    backgroundColor: isDark ? '#18181b' : '#f4f4f8',
+    color: isDark ? '#ffffff' : '#09090b',
+    border: isDark ? '1px solid #3f3f46' : '1px solid #d4d4d8'
+  };
+
+  const labelStyle = {
+    ...styles.label,
+    color: isDark ? '#a1a1aa' : '#71717a'
+  };
+
+  const headerRowStyle = {
+    ...styles.headerRow,
+    backgroundColor: isDark ? '#27272a' : '#f4f4f8',
+    color: isDark ? '#a1a1aa' : '#71717a'
+  };
+
+  const resetBtnStyle = {
+    ...styles.resetBtn,
+    backgroundColor: isDark ? '#3f3f46' : '#e4e4e7',
+    color: isDark ? '#ffffff' : '#18181b',
+    border: isDark ? '1px solid #52525b' : '1px solid #d4d4d8'
+  };
+
+  const pageBtnStyle = {
+    ...styles.pageBtn,
+    backgroundColor: isDark ? '#27272a' : '#f4f4f8',
+    color: isDark ? '#ffffff' : '#18181b',
+    border: isDark ? '1px solid #3f3f46' : '1px solid #d4d4d8'
+  };
+
   return (
-    <div style={styles.container}>
+    <div style={containerStyle}>
       {/* Controls Bar */}
       <div style={styles.controlsBar}>
         <div style={styles.searchBox}>
@@ -104,16 +156,16 @@ export default function DataGrid({
             placeholder="Search logs by message, source, or ID..."
             value={searchQuery}
             onChange={(e) => handleSearchInputChange(e.target.value)}
-            style={styles.searchInput}
+            style={inputStyle}
           />
         </div>
 
         <div style={styles.filterGroup}>
-          <label style={styles.label}>Level:</label>
+          <label style={labelStyle}>Level:</label>
           <select 
             value={selectedLevel} 
             onChange={(e) => handleLevelSelectChange(e.target.value)}
-            style={styles.select}
+            style={selectStyle}
           >
             <option value="all">All Levels</option>
             <option value="info">Info</option>
@@ -123,11 +175,11 @@ export default function DataGrid({
         </div>
 
         <div style={styles.filterGroup}>
-          <label style={styles.label}>Latency Sort:</label>
+          <label style={labelStyle}>Latency Sort:</label>
           <select 
             value={sortDirection} 
             onChange={(e) => onSortChange(e.target.value)}
-            style={styles.select}
+            style={selectStyle}
           >
             <option value="none">Default Order</option>
             <option value="desc">Highest First (Slowest)</option>
@@ -136,11 +188,11 @@ export default function DataGrid({
         </div>
 
         <div style={styles.filterGroup}>
-          <label style={styles.label}>Page Size:</label>
+          <label style={labelStyle}>Page Size:</label>
           <select 
             value={pageSize} 
             onChange={(e) => handlePageSizeSelectChange(e.target.value)}
-            style={styles.select}
+            style={selectStyle}
           >
             <option value={10}>10 per page</option>
             <option value={25}>25 per page</option>
@@ -151,7 +203,7 @@ export default function DataGrid({
 
         <button 
           onClick={handleResetAllFilters} 
-          style={styles.resetBtn}
+          style={resetBtnStyle}
           title="Reset search query, level filter, and sort direction in 1 atomic pass"
         >
           ↺ Reset Filters
@@ -159,7 +211,7 @@ export default function DataGrid({
       </div>
 
       {/* Grid Headers */}
-      <div style={styles.headerRow}>
+      <div style={headerRowStyle}>
         <span>Time</span>
         <span>Source</span>
         <span>Level</span>
