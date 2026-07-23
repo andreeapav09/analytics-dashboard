@@ -143,3 +143,58 @@ In web applications, the main performance bottleneck is almost never JavaScript 
 - Use React.memo and useCallback to isolate component render boundaries so streaming state updates don't trigger unnecessary row re-renders."
 8. **Why to use useReducer instead of many useStates?**
 The main reason to use useReducer is clean code architecture and testability. But performance-wise, it allows (atomic state transitions) to update multiple state properties in a single dispatch pass so React performs only 1 re-render instead of multiple passes.
+9. **Can you write useEffect(async () => { ... }) directly?**
+- No! You cannot make the root useEffect callback async.
+- Why? React expects useEffect to return either undefined or a cleanup function (return () => clearInterval(...)). An async function implicitly returns a Promise, which breaks React Fiber's cleanup mechanism.
+- Solution: Create **an inner async function inside useEffect** and call it immediately like in this snippet: 
+```javascript
+  useEffect(() => { // It is not async
+    async function fetchData() { // This function is async
+      const res = await fetch('/api/data'); // return a JS Promise
+      const json = await res.json();
+      setData(json);
+    }
+    fetchData(); // Calling the async function immediately
+  }, []);
+```
+
+---
+
+## More about Vite and Bundling
+Here is Vite and Bundling explained like you are 5 years old, using a Lego Toy Store 🧩 analogy!
+
+📦 What is "Bundling"?
+Imagine your React app is made of 1,000 separate tiny Lego boxes (your .jsx files, .css files, and node_modules).
+
+Browsers don't like carrying 1,000 loose tiny boxes over the internet. "Bundling" means taking all those loose boxes and packing them into 1 or 2 clean shipping boxes so the browser can read them easily.
+
+🐢 The Old Way (Webpack / Older Angular CLI): "The Slow Packer"
+When you type **npm start**:
+
+Before opening the store door to customers, Webpack opens all 1,000 Lego boxes, reads every single instruction manual, and glues them all together into one giant heavy block.
+The Result: You sit at your computer waiting 30 to 60 seconds just for your dev server to start!
+Changing 1 line of code: If you change 1 color in LogRow.jsx, Webpack has to re-glue all 1,000 boxes again!
+⚡ The Vite Way: "The Instant On-Demand Express"
+When you type **npm run dev** with Vite:
+
+Instant Store Opening (~0.1 seconds): Vite opens the store door immediately! It does NOT pre-glue the 1,000 boxes up-front.
+On-Demand Delivery: When the browser loads the page and says: "Hey, I need DataGrid.jsx right now!", Vite hands the browser only that single file on-demand.
+Instant Editing (HMR): When you edit 1 line in DataGrid.jsx, Vite swaps only that 1 file in your browser instantly without reloading the page or losing your state.
+🚀 Summary:
+Bundling = Packing 1,000 loose code files into a clean bundle for the browser.
+Old Webpack = Glues all 1,000 files together before opening the server (Slow 🐢).
+New Vite = Starts instantly and delivers files on-demand as requested (Super Fast ⚡).
+
+**NOTE**
+In Angular, the CLI command you type is still **ng serve**. But starting in Angular 16+, the Angular core team replaced the old Webpack engine under ng serve with Esbuild and Vite so Angular developers get the same instant startup times as React developers!
+
+---
+
+## Struggles coming from TS to JS: (most of them related to type checking)
+1. **No explicit structure** for interfaces
+2. **No compilation error** for the rest of the occurrences when **refactoring** the name of a property
+3. **Silent bugs for typos** in string literals like in **dispatched actions**
+4. **No compilation errors** for type mistakes (method expects a number but gets a string)
+
+5. No hover tooltips for properties, types for interfaces
+6. JS needs extra defensive checks for null and undefined
