@@ -51,6 +51,18 @@ export function generateSingleLog(index = Date.now()) {
 }
 
 /**
+ * Generates an array of N metric logs at once (used for customizable batch sizes or stress tests)
+ */
+export function generateLogBatch(count = 1) {
+  const batch = [];
+  const now = Date.now();
+  for (let i = 0; i < count; i++) {
+    batch.push(generateSingleLog(now + i));
+  }
+  return batch;
+}
+
+/**
  * Generates an array of N metric logs (default 10,000 for high-volume testing)
  */
 export function generateInitialLogs(count = 10000) {

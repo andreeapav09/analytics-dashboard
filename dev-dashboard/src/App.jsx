@@ -1,17 +1,17 @@
 import React, { useReducer, useEffect, lazy, Suspense, useCallback } from 'react';
 import { dashboardReducer, initialState } from './state/dashboardReducer';
-import { generateInitialLogs } from './utils/mockData';
+import { generateInitialLogs, generateLogBatch } from './utils/mockData';
 import PerformanceMonitor from './components/PerformanceMonitor';
 import LiveMetricPoller from './components/LiveMetricPoller';
 import DataGrid from './components/DataGrid';
 import { useTheme } from './context/ThemeContext';
 
-// 1. LAZY LOADING: Dynamically import LazyChart bundle chunk
+// LAZY LOADING: Dynamically import LazyChart bundle chunk
 const LazyChart = lazy(() => import('./components/LazyChart'));
 
 export default function App() {
   // Global Theme Context Hook (useContext)
-  const { theme, toggleTheme } = useTheme(); // custom hook
+  const { theme, toggleTheme } = useTheme();
 
   // Initialize useReducer state engine
   const [state, dispatch] = useReducer(dashboardReducer, initialState);
@@ -23,9 +23,9 @@ export default function App() {
     dispatch({ type: 'SET_INITIAL_LOGS', payload: initialLogs });
   }, []);
 
-  // Dispatch Handlers (Memoized with useCallback for reference stability)
-  const handleNewLog = useCallback((newLog) => {
-    dispatch({ type: 'ADD_LOG', payload: newLog });
+  // Dispatch Handlers (Memoized with useCallback for referential stability)
+  const handleNewLogsBatch = useCallback((newBatch) => {
+    dispatch({ type: 'ADD_LOGS_BATCH', payload: newBatch });
   }, []);
 
   const handleToggleFlag = useCallback((id) => {
@@ -46,6 +46,21 @@ export default function App() {
 
   const handleSortChange = useCallback((sortDir) => {
     dispatch({ type: 'SET_SORT_DIRECTION', payload: sortDir });
+  }, []);
+
+  const handleBatchSizeChange = useCallback((size) => {
+    dispatch({ type: 'SET_BATCH_SIZE', payload: size });
+  }, []);
+
+  const handleIntervalChange = useCallback((ms) => {
+    dispatch({ type: 'SET_POLLING_INTERVAL', payload: ms });
+  }, []);
+
+  // Instant +10,000 Stress Test Injection Handler
+  const handleInjectStressBatch = useCallback(() => {
+    console.log('Injecting +10,000 stress test logs into memory...');
+    const stressBatch = generateLogBatch(10000);
+    dispatch({ type: 'ADD_LOGS_BATCH', payload: stressBatch });
   }, []);
 
   // Dynamic Theme Styles
@@ -77,21 +92,26 @@ export default function App() {
       </header>
 
       {/* Widget 1: Performance Render Counter */}
-      <PerformanceMonitor
+      <PerformanceMonitor 
         totalLogsCount={state.logs.length}
         filteredLogsCount={state.logs.length}
         isPollingActive={state.isPollingActive}
       />
 
-      {/* Widget 2: Live Poller */}
-      <LiveMetricPoller
+      {/* Widget 2: Live Streaming Poller with Dynamic Controls & Stress Button */}
+      <LiveMetricPoller 
         isPollingActive={state.isPollingActive}
-        onNewLog={handleNewLog}
+        pollingInterval={state.pollingInterval}
+        batchSize={state.batchSize}
+        onNewLogsBatch={handleNewLogsBatch}
         onTogglePolling={handleTogglePolling}
+        onIntervalChange={handleIntervalChange}
+        onBatchSizeChange={handleBatchSizeChange}
+        onInjectStressBatch={handleInjectStressBatch}
       />
 
       {/* Widget 3: Data Grid with Pagination */}
-      <DataGrid
+      <DataGrid 
         logs={state.logs}
         searchQuery={state.searchQuery}
         selectedLevel={state.selectedLevel}

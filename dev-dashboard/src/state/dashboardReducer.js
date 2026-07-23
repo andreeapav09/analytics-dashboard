@@ -6,6 +6,8 @@ export const initialState = {
   selectedLevel: 'all',    // 'all' | 'info' | 'warn' | 'error'
   sortDirection: 'none',   // 'none' | 'desc' | 'asc'
   isPollingActive: true,
+  batchSize: 1,           // Number of logs generated per stream tick (1, 5, 50, 100, 10000)
+  pollingInterval: 2000,  // Stream tick interval in ms (200ms, 500ms, 1000ms, 2000ms, 5000ms)
 };
 
 export function dashboardReducer(state, action) {
@@ -17,14 +19,19 @@ export function dashboardReducer(state, action) {
       };
 
     case 'ADD_LOG':
-      // Prepend new log to top of list
       return {
         ...state,
         logs: [action.payload, ...state.logs]
       };
 
+    case 'ADD_LOGS_BATCH':
+      // Prepend an array batch of logs immutably
+      return {
+        ...state,
+        logs: [...action.payload, ...state.logs]
+      };
+
     case 'TOGGLE_FLAG':
-      // Immutably update the flagged property of a specific log item
       return {
         ...state,
         logs: state.logs.map(log => 
@@ -50,6 +57,18 @@ export function dashboardReducer(state, action) {
       return {
         ...state,
         sortDirection: action.payload
+      };
+
+    case 'SET_BATCH_SIZE':
+      return {
+        ...state,
+        batchSize: Number(action.payload)
+      };
+
+    case 'SET_POLLING_INTERVAL':
+      return {
+        ...state,
+        pollingInterval: Number(action.payload)
       };
 
     case 'TOGGLE_POLLING':
