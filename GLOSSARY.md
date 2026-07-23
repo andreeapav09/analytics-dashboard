@@ -48,7 +48,7 @@ This glossary contains key terms and concepts that the learner has demonstrated 
 - **`useEffect`**: Runs actions outside of React, like API calls or timers (e.g., fetching data on page load, setting up event listeners).
 - **`useRef`**: Stores private data that doesn't trigger re-renders, or grabs a direct link to a real HTML element (e.g., saving a timer ID, focusing an input box).
 - **`useContext`**: Accesses global data (like Theme or User Session) directly from a Context Provider anywhere in the component tree, solving "Prop Drilling" without passing props through intermediate components.
-- **Reconciliation Key (`key={log.id}`)**: A unique, stable identifier assigned to items in a rendered list. It allows React Fiber to identify which specific items have changed, moved, or been removed, updating only those DOM nodes instead of destroying and rebuilding the entire list. (Avoid using array indexes for dynamic lists).
+- **Reconciliation Key (`key={log.id}`)**: A unique, stable identifier assigned to items in a rendered list. It allows React Fiber to identify which specific items have changed, moved, or been removed, updating **only those DOM nodes** instead of destroying and rebuilding the entire list. (Avoid using array indexes for dynamic lists).
 - **DOM Windowing / Slicing (`.slice(0, 100)`)**: A performance technique where expensive array operations (filtering/sorting 10,000 items) are computed in JavaScript memory, but only a small visible subset (e.g. 100 items) is rendered into the browser DOM to prevent HTML node bloat and browser rendering freeze.
 - **Pagination State (`currentPage` & `pageSize`)**: Managing table pages by slicing the `useMemo` filtered array: `logs.slice((currentPage - 1) * pageSize, currentPage * pageSize)`. Automatically resets `currentPage = 1` whenever filter criteria change to prevent out-of-bound blank screens.
 - **Callback Function**: A function passed as an argument to another function, intended to be executed ("called back") at a later time (e.g., when an event occurs or an async action completes).
@@ -56,7 +56,7 @@ This glossary contains key terms and concepts that the learner has demonstrated 
 - **Memoization**: An optimization technique of caching expensive calculations or rendering results. In React, it uses 3 main tools:
   * **`useMemo`**: Caches the *result* of a calculation (like sorting 10,000 logs) to avoid running it on every render.
   * **`React.memo`**: Caches the *component output* (like a list row), skipping re-renders if props have not changed.
-  * **`useCallback`**: Caches a *function reference* so it isn't recreated on every render, preventing it from breaking `React.memo` in child components.
+  * **`useCallback`**: Caches a *function reference* so it isn't recreated on every render, preventing it from breaking `React.memo` in child components. ->  You only need `useCallback` when a function is passed as a prop to a memoized child component or used as a dependency in a child `useEffect`.
 
   **Memoization Cheat Sheet**:
   | Tool | What it Caches | Where it is Written |
@@ -103,6 +103,7 @@ The only time React mutates with = is when we use **useRef**.
 5. **Lazy Loading Granularity (Route-Level vs Component-Level Code-Splitting)**: 
 - In Angular, lazy loading was historically route-based (`loadChildren` in router configs). 
 - In React, `React.lazy()` and `<Suspense>` enable **component-level code-splitting** anywhere in the UI tree (e.g. lazy loading heavy charts, modals, or widgets), splitting the JavaScript bundle into smaller on-demand network chunks.
+6. Plain JSX components implicitly assume prop structures without **compile-time contract safety**, whereas TSX introduces prop interfaces and static type checking.
 
 ---
 
@@ -127,3 +128,5 @@ To separate event intent (action) and state transitions (reducer) from UI calcul
 If we had forgotten the cleanup function, clicking Pause/Resume 5 times would leave 5 duplicate timers running in the background simultaneously, flooding the app with logs and causing a major memory leak!
 5. **Why do console logs or component functions execute twice in React development?**
 That is caused by <React.StrictMode>. In development, React intentionally double-invokes render functions and effects (to make sure the functions are pure) to help developers catch impure side-effects and cleanup bugs. In production builds, Strict Mode double-invocations are automatically removed.
+6. **What is the complete performance optimization strategy for rendering 10,000+ streaming data records in React?**
+Use `useReducer` for state, `useMemo` for filtering/sorting, `React.memo` & `useCallback` for row stability, viewport pagination slicing, and `React.lazy` for heavy modules.

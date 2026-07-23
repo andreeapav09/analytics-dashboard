@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson 9: Comprehensive React & Architecture Interview Quiz (30 Questions)</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    .quiz-card {
+      background-color: #1e1e24;
+      border: 1px solid #27272a;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    .question-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 1rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+    .question-number {
+      color: #5d3fd3;
+      font-weight: 700;
+    }
+    .options-list {
+      display: flex;
+      flexDirection: column;
+      gap: 0.6rem;
+      margin-bottom: 1rem;
+    }
+    .option-label {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background-color: #18181b;
+      border: 1px solid #3f3f46;
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: #e4e4e7;
+      transition: border-color 0.15s ease, background-color 0.15s ease;
+    }
+    .option-label:hover {
+      border-color: #5d3fd3;
+      background-color: #27272a;
+    }
+    .option-label input[type="radio"] {
+      accent-color: #5d3fd3;
+      width: 18px;
+      height: 18px;
+    }
+    .feedback-box {
+      display: none;
+      padding: 1rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-top: 0.8rem;
+    }
+    .feedback-correct {
+      background-color: #14532d;
+      border: 1px solid #22c55e;
+      color: #f0fdf4;
+    }
+    .feedback-incorrect {
+      background-color: #7f1d1d;
+      border: 1px solid #ef4444;
+      color: #fef2f2;
+    }
+    .check-btn {
+      background-color: #5d3fd3;
+      color: #ffffff;
+      border: none;
+      padding: 0.5rem 1.25rem;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: opacity 0.15s ease;
+    }
+    .check-btn:hover {
+      opacity: 0.9;
+    }
+    .score-summary {
+      position: sticky;
+      top: 1rem;
+      z-index: 10;
+      background-color: #27272a;
+      border: 2px solid #5d3fd3;
+      color: #ffffff;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+    .score-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+    .score-badge {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #10b981;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="lesson-meta">Lesson 9 • Technical Assessment</div>
+      <h1>React Architecture & Senior Developer Quiz</h1>
+      <p>30 Multiple-Choice Questions covering React Fiber, Immutability, Hooks, Performance Optimization, and Angular/Vue Comparisons.</p>
+    </header>
+
+    <div class="score-summary">
+      <div>
+        <span class="score-title">Your Quiz Score:</span>
+        <span id="score-text" class="score-badge">0 / 30 (0%)</span>
+      </div>
+      <button class="check-btn" onclick="checkAllAnswers()">Check All Answers</button>
+    </div>
+
+    <main id="quiz-container">
+      <!-- Questions generated dynamically by JS below -->
+    </main>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        id: 1,
+        question: "How does React's change detection model fundamentally differ from traditional Angular (Zone.js)?",
+        options: [
+          "React scans template bindings directly and re-evaluates expressions like {{ user.name }}.",
+          "React re-executes component functions to generate a new Virtual DOM tree and diffs it against the old tree (Fiber Reconciliation).",
+          "React uses getter/setter proxies on all state objects to trigger pinpoint DOM updates.",
+          "React compiles templates directly into imperative real DOM mutation instructions."
+        ],
+        correct: 1,
+        explanation: "React relies on a top-down execution model: state changes trigger function re-executions to build a Virtual DOM tree. The React Fiber engine diffs the new VDOM against the old VDOM (Reconciliation) and patches only changed nodes to the real DOM (Commit phase). Traditional Angular uses Zone.js dirty-checking across template bindings."
+      },
+      {
+        id: 2,
+        question: "Why does direct state assignment (e.g., state.user.name = 'Bob') fail to update the UI in React?",
+        options: [
+          "JavaScript does not support object property mutations.",
+          "React checks strict object reference equality (oldState === newState). In-place mutations keep the exact same memory address, so React assumes nothing changed.",
+          "React setter functions are only required for numbers, not objects.",
+          "Direct mutations are converted to private class fields automatically."
+        ],
+        correct: 1,
+        explanation: "React relies on shallow reference equality (`oldState === newState`). Direct mutation alters the object in-place at the exact same memory address, so React's comparison evaluates to `true` and skips re-rendering."
+      },
+      {
+        id: 3,
+        question: "In what scenario does Angular's change detection behave most like React's strict immutability rule?",
+        options: [
+          "When using standard `[(ngModel)]` two-way data binding.",
+          "When configuring `ChangeDetectionStrategy.OnPush` in Angular components.",
+          "When writing Angular services with `@Injectable()`.",
+          "When using template reference variables (`#myInput`)."
+        ],
+        correct: 1,
+        explanation: "Angular's `OnPush` change detection strategy instructs Angular to skip dirty-checking component subtrees unless an `@Input()` reference pointer changes (`oldInput !== newInput`), mirroring React's immutable reference check!"
+      },
+      {
+        id: 4,
+        question: "What is the primary architectural purpose of using `useReducer` over multiple `useState` hooks in a complex view?",
+        options: [
+          "To speed up CSS styling compilation in Vite.",
+          "To separate event intent (actions) and pure state transitions (reducer) from UI calculations, making state logic testable in isolation.",
+          "To allow components to mutate global variables directly.",
+          "To bypass React Fiber's virtual DOM reconciliation."
+        ],
+        correct: 1,
+        explanation: "`useReducer` consolidates complex, multi-field state into a pure reducer function `(state, action) => newState`. This decouples state transitions from UI rendering and allows state logic to be unit-tested without rendering HTML DOM elements."
+      },
+      {
+        id: 5,
+        question: "How does the reducer function update a single property (e.g. `searchQuery`) without wiping out the other 4 properties in state?",
+        options: [
+          "By calling `Object.freeze()` on the old state.",
+          "By using the JavaScript spread operator `return { ...state, searchQuery: action.payload }` to copy existing properties.",
+          "The reducer automatically merges properties behind the scenes.",
+          "By mutating `state.searchQuery` directly."
+        ],
+        correct: 1,
+        explanation: "The object spread operator `...state` copies all existing state properties into a new object container, and `searchQuery: action.payload` overwrites only the target property immutably."
+      },
+      {
+        id: 6,
+        question: "Why should data filtering (e.g. filtering 10,000 logs) be performed in the Component using `useMemo` rather than inside the Reducer?",
+        options: [
+          "Because Reducers cannot process JavaScript arrays.",
+          "Filtering in the Reducer would overwrite or destroy raw source-of-truth data, whereas `useMemo` computes derived state while keeping raw data intact.",
+          "Because `useMemo` is 100x slower than Reducer functions.",
+          "Because Reducers are only allowed to return strings."
+        ],
+        correct: 1,
+        explanation: "Filtering inside the Reducer would overwrite `state.logs`, permanently losing the non-matching items when the search box is cleared. Computing derived state in the component with `useMemo` preserves raw data and caches calculations."
+      },
+      {
+        id: 7,
+        question: "Why is `useRef` the ONLY place in React where direct assignment (`myRef.current = newValue`) is idiomatic and safe?",
+        options: [
+          "Because `useRef` creates a global Redux store.",
+          "Because mutating `myRef.current` alters data silently in memory without triggering a re-render or Fiber reconciliation pass.",
+          "Because `useRef` converts JavaScript to C++.",
+          "Because `useRef` can only hold string primitive values."
+        ],
+        correct: 1,
+        explanation: "`useRef` returns a persistent container `{ current: value }`. Updating `.current` mutates that container silently in memory without scheduling a component re-render, making it perfect for tracking timers or render counts."
+      },
+      {
+        id: 8,
+        question: "What would happen if you wrote `setRenderCount(renderCount + 1)` directly inside a component's root function body?",
+        options: [
+          "It would increment the render count smoothly.",
+          "It would trigger an immediate infinite render loop crash ('Too many re-renders').",
+          "It would convert the component into an Angular directive.",
+          "Nothing, React ignores state setters inside function bodies."
+        ],
+        correct: 1,
+        explanation: "Calling a state setter directly in the render body triggers a new re-render, which executes the render body again, calling the setter again... resulting in an immediate infinite loop crash."
+      },
+      {
+        id: 9,
+        question: "What is the primary role of `React.memo`?",
+        options: [
+          "To cache the numerical return value of a mathematical function.",
+          "To wrap a Component export and skip re-rendering the component UI if its props have not changed (`oldProps === newProps`).",
+          "To lazy-load JavaScript file chunks over the network.",
+          "To connect a component to `useContext`."
+        ],
+        correct: 1,
+        explanation: "`React.memo` is a Higher-Order Component that memoizes a component's UI rendering output. If incoming props are shallowly equal to previous props, React skips running the component function entirely."
+      },
+      {
+        id: 10,
+        question: "What is the primary role of `useMemo`?",
+        options: [
+          "To wrap a child component function definition.",
+          "To cache the return value of an expensive calculation inside a component body, skipping recalculation unless dependencies change.",
+          "To set up interval timers in the browser.",
+          "To convert JSX to HTML string templates."
+        ],
+        correct: 1,
+        explanation: "`useMemo` is a hook called inside a component function body. It caches the calculated return value (like sorting/filtering 10,000 array elements) and only re-executes the calculation when its dependency array items change."
+      },
+      {
+        id: 11,
+        question: "What is the Golden Rule for when `useCallback` is actually required?",
+        options: [
+          "You must wrap every single function in every React component in `useCallback`.",
+          "You only need `useCallback` when a function is passed as a prop to a memoized child component or used as a dependency in a child `useEffect`.",
+          "You only need `useCallback` for `useEffect` cleanup functions.",
+          "You use `useCallback` to import CSS stylesheet files."
+        ],
+        correct: 1,
+        explanation: "`useCallback` stabilizes function memory references (`oldFn === newFn`). You only need it when passing callbacks to memoized child components (`React.memo`) or as dependencies to child `useEffect` hooks."
+      },
+      {
+        id: 12,
+        question: "Why does `[...result].sort((a, b) => b.latency - a.latency)` use the spread operator `[...result]` before sorting?",
+        options: [
+          "Because `.sort()` cannot run on arrays with numbers.",
+          "Because JavaScript's `.sort()` mutates arrays in-place. Creating a shallow copy `[...result]` prevents mutating the original `logs` array in state.",
+          "Because spread syntax speeds up sorting by 50%.",
+          "Because `b.latency - a.latency` requires an object array."
+        ],
+        correct: 1,
+        explanation: "`Array.prototype.sort()` mutates the target array in-place. Creating a shallow copy `[...result]` allocates a new top-level array container, preserving original state immutability."
+      },
+      {
+        id: 13,
+        question: "What does `b.latency - a.latency` produce in JavaScript's array sort comparator?",
+        options: [
+          "Ascending sort order (lowest latency first).",
+          "Descending sort order (highest/slowest latency first).",
+          "Alphabetical sort order.",
+          "Random array shuffling."
+        ],
+        correct: 1,
+        explanation: "In `(a, b) => comparator`, returning a positive number puts `b` before `a`. If $b=800$ and $a=100$, $800-100=700$ (positive), placing higher numbers first (descending order)."
+      },
+      {
+        id: 14,
+        question: "What is a 'Stale Closure' in React?",
+        options: [
+          "A bug where CSS styles fail to load on mobile browsers.",
+          "A bug where a function or `useEffect` captures outdated variables from a previous render pass because it wasn't re-executed when those variables changed.",
+          "A feature that automatically clears browser cookies.",
+          "A method for compressing JavaScript bundles."
+        ],
+        correct: 1,
+        explanation: "Because JavaScript functions form closures over scope variables at the time of creation, omitting reactive dependencies from `useEffect` or `useCallback` leaves them holding onto stale, outdated state/prop values."
+      },
+      {
+        id: 15,
+        question: "Why does React's ESLint plugin enforce the 'Exhaustive Dependencies Rule' for `useEffect` and `useMemo`?",
+        options: [
+          "To enforce camelCase variable naming.",
+          "To guarantee that all reactive values read inside the hook are declared in the dependency array, eliminating stale closure bugs.",
+          "To prevent components from using TypeScript.",
+          "To force developers to use `useReducer`."
+        ],
+        correct: 1,
+        explanation: "The Exhaustive Dependencies rule ensures that whenever any prop, state, or variable read inside a hook changes, the hook re-executes, avoiding stale closures."
+      },
+      {
+        id: 16,
+        question: "Why must `setInterval` IDs be cleaned up via `return () => clearInterval(id)` inside `useEffect`?",
+        options: [
+          "To prevent the browser from executing duplicate background timers simultaneously when props change or components unmount.",
+          "Because `setInterval` deletes local storage after 10 seconds.",
+          "Because React throws a syntax error without `clearInterval`.",
+          "To allow `useReducer` to reset its initial state."
+        ],
+        correct: 0,
+        explanation: "Without `clearInterval` in the `useEffect` cleanup return function, every re-render or prop toggle leaves previous background timers running, causing memory leaks and duplicate execution."
+      },
+      {
+        id: 17,
+        question: "What is the role of the `key` prop (e.g. `key={log.id}`) when rendering dynamic lists in React?",
+        options: [
+          "It sets the CSS z-index of the table row.",
+          "It provides a unique, stable identifier for React Fiber reconciliation to track DOM node movements without destroying and rebuilding list items.",
+          "It exposes the item to browser search engines.",
+          "It automatically formats timestamp strings."
+        ],
+        correct: 1,
+        explanation: "The `key` prop allows React's Fiber engine to map Virtual DOM nodes to real DOM elements across render passes. Stable keys prevent React from tearing down and recreating DOM elements needlessly."
+      },
+      {
+        id: 18,
+        question: "What is 'DOM Windowing / Viewport Slicing' (e.g., `.slice(startIndex, startIndex + pageSize)`)?",
+        options: [
+          "A method for opening new browser popup windows.",
+          "A performance technique where calculations run across 10,000 items in memory, but only a small visible subset (e.g. 25-100 items) is rendered into the DOM.",
+          "A CSS trick for making tables transparent.",
+          "An Angular feature for compiling HTML templates."
+        ],
+        correct: 1,
+        explanation: "Filtering 10,000 items in memory takes ~1ms, but rendering 10,000 DOM elements freezes the browser. Viewport slicing renders only the active page items into the DOM, keeping rendering fast."
+      },
+      {
+        id: 19,
+        question: "What is 'Prop Drilling' and how does `useContext` solve it?",
+        options: [
+          "Passing state down through many intermediate parent layers that don't need it. `useContext` broadcasts data globally to any child directly.",
+          "A technique for downloading npm packages.",
+          "A bug where props are deleted on page refresh.",
+          "A method for sorting numbers in reverse order."
+        ],
+        correct: 0,
+        explanation: "Prop Drilling is passing data down multiple component layers unnecessarily. `useContext` establishes a Context Provider that allows any descendant component to consume global state directly via `useContext()`."
+      },
+      {
+        id: 20,
+        question: "In `const { theme, toggleTheme } = useTheme()`, what is `useTheme`?",
+        options: [
+          "A standard JavaScript string variable.",
+          "Our Custom Hook that calls `useContext(ThemeContext)` internally and returns the context value object.",
+          "A built-in DOM event listener.",
+          "An Angular dependency injection token."
+        ],
+        correct: 1,
+        explanation: "`useTheme` is a Custom Hook. In React, any custom function starting with `use` that calls internal hooks (like `useContext`) is categorized as a Custom Hook."
+      },
+      {
+        id: 21,
+        question: "How does Code-Splitting with `React.lazy()` improve initial page load performance?",
+        options: [
+          "It converts JavaScript files into PNG images.",
+          "It instructs the build tool (Vite/Webpack) to split dynamic components into separate bundle chunks downloaded on-demand over the network.",
+          "It compresses CSS files using Gzip.",
+          "It runs all JavaScript on a web worker thread."
+        ],
+        correct: 1,
+        explanation: "`React.lazy(() => import('./Component'))` separates dynamic components into standalone `.js` chunk files, keeping the initial bundle small and loading extra code only when needed."
+      },
+      {
+        id: 22,
+        question: "What is the purpose of `<Suspense fallback={<Loader />}>` when using `React.lazy()`?",
+        options: [
+          "To catch JavaScript runtime try/catch errors.",
+          "To specify a fallback loading UI (like a spinner or placeholder text) to display while the dynamic bundle chunk is downloading.",
+          "To prevent components from re-rendering on state changes.",
+          "To wrap `useReducer` actions."
+        ],
+        correct: 1,
+        explanation: "Because lazy-loaded JavaScript chunks take time to download over the network, `<Suspense>` handles the asynchronous loading state and renders the `fallback` UI until the chunk arrives."
+      },
+      {
+        id: 23,
+        question: "How does React's `React.lazy()` compare to traditional Angular code-splitting?",
+        options: [
+          "Angular lazy loading was historically route-based (`loadChildren`), whereas React's `React.lazy()` allows component-level code-splitting anywhere in the UI tree.",
+          "React lazy loading only works on backend Node.js servers.",
+          "Angular does not support code-splitting.",
+          "React lazy loading requires WebGL graphics cards."
+        ],
+        correct: 0,
+        explanation: "Angular historically focused on route-level lazy loading (`loadChildren`), while `React.lazy()` provides granular component-level code-splitting anywhere in the JSX tree (modals, tabs, heavy widgets)."
+      },
+      {
+        id: 24,
+        question: "Why does `<React.StrictMode>` invoke component render bodies TWICE on every render pass in development?",
+        options: [
+          "It is a bug in Vite development server.",
+          "To help developers detect non-pure render logic, unexpected side-effects, and state mutations during development.",
+          "To test internet connection speeds.",
+          "To duplicate DOM elements on screen."
+        ],
+        correct: 1,
+        explanation: "Strict Mode intentionally double-invokes render functions and state initializers in development to expose impure functions that produce side-effects or mutate data outside their scope."
+      },
+      {
+        id: 25,
+        question: "If a component uses `const ref = useRef(0)` and increments `ref.current += 1` in the render body, why does the ref reach 2 on initial load under Strict Mode?",
+        options: [
+          "Because `useRef(0)` adds 2 automatically.",
+          "Starting at 0, Strict Mode double-invokes the render body during the initial mount pass (0 + 1 + 1 = 2).",
+          "Because the DOM renders twice in production.",
+          "Because `useReducer` initializes twice."
+        ],
+        correct: 1,
+        explanation: "With `useRef(0)`, the ref starts at 0. During the initial mount render pass in development, Strict Mode calls the render body twice, executing `0 + 1 + 1 = 2`."
+      },
+      {
+        id: 26,
+        question: "What is the difference between `result = logs` vs. `result = [...logs]` in JavaScript?",
+        options: [
+          "Both statements perform identical operations.",
+          "`result = logs` assigns a second pointer to the exact same memory address, whereas `[...logs]` allocates a new top-level array container in memory.",
+          "`result = [...logs]` deletes the original array.",
+          "`result = logs` creates a deep clone of all nested items."
+        ],
+        correct: 1,
+        explanation: "In JavaScript, objects and arrays are assigned by reference pointer. `result = logs` shares the same memory address, while `[...logs]` creates a brand-new array container (shallow copy)."
+      },
+      {
+        id: 27,
+        question: "How does React's `children` prop map to Angular and Vue concepts?",
+        options: [
+          "It maps to Angular's `@Output()` and Vue's `v-model`.",
+          "It maps to Angular's `<ng-content>` (Content Projection) and Vue's `<slot>`.",
+          "It maps to Angular services and Vue Pinia stores.",
+          "It maps to HTML `<iframe>` tags."
+        ],
+        correct: 1,
+        explanation: "React automatically passes nested JSX content between opening and closing tags `<MyModal>... content ...</MyModal>` under the built-in `children` prop, identical to Angular `<ng-content>` or Vue `<slot>`."
+      },
+      {
+        id: 28,
+        question: "Why do professional development teams strongly prefer TSX (React + TypeScript) over plain JSX?",
+        options: [
+          "Plain JSX components implicitly assume prop structures without compile-time contract safety, whereas TSX introduces prop interfaces and static type checking.",
+          "TSX files execute 50% faster in web browsers.",
+          "Plain JSX cannot render HTML buttons.",
+          "TSX replaces the browser Virtual DOM."
+        ],
+        correct: 0,
+        explanation: "In plain JSX, components implicitly assume props exist without compile-time validation. TSX defines strict prop interfaces, providing self-documenting code and compile-time error detection."
+      },
+      {
+        id: 29,
+        question: "Why should `currentPage` state be reset to `1` whenever search query or level filter dropdowns change?",
+        options: [
+          "Because React Fiber crashes if `currentPage` exceeds 5.",
+          "To prevent the user from being stuck on an out-of-bounds blank page if the new filtered dataset has fewer total pages than the previous filter.",
+          "Because `useMemo` requires `currentPage` to be 1.",
+          "Because Vite dev server reloads the page."
+        ],
+        correct: 1,
+        explanation: "If a user is on Page 10 of a 500-log dataset and types a search query that yields only 5 results (1 total page), failing to reset `currentPage` to 1 leaves the user viewing an empty Page 10."
+      },
+      {
+        id: 30,
+        question: "What is the complete performance optimization strategy for rendering 10,000+ streaming data records in React?",
+        options: [
+          "Use plain `useState` arrays, disable keys, and re-fetch data on every keystroke.",
+          "Use `useReducer` for state, `useMemo` for filtering/sorting, `React.memo` & `useCallback` for row stability, viewport pagination slicing, and `React.lazy` for heavy modules.",
+          "Convert all components to class components and use `forceUpdate()`.",
+          "Render all 10,000 HTML elements directly into the DOM without keys."
+        ],
+        correct: 1,
+        explanation: "High performance is achieved by combining centralized `useReducer` state, `useMemo` derived state caching, `React.memo` + `useCallback` item render isolation, viewport slicing for DOM node control, and code-splitting."
+      }
+    ];
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      questions.forEach((q, index) => {
+        const card = document.createElement('div');
+        card.className = 'quiz-card';
+        card.id = `card-${q.id}`;
+
+        const optionsHtml = q.options.map((opt, i) => `
+          <label class="option-label" id="label-${q.id}-${i}">
+            <input type="radio" name="question-${q.id}" value="${i}">
+            <span>${String.fromCharCode(65 + i)}. ${opt}</span>
+          </label>
+        `).join('');
+
+        card.innerHTML = `
+          <div class="question-title">
+            <span class="question-number">Q${q.id}.</span>
+            <span>${q.question}</span>
+          </div>
+          <div class="options-list">
+            ${optionsHtml}
+          </div>
+          <button class="check-btn" onclick="checkSingleAnswer(${q.id})">Check Answer</button>
+          <div class="feedback-box" id="feedback-${q.id}"></div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    function checkSingleAnswer(qId) {
+      const q = questions.find(item => item.id === qId);
+      const selected = document.querySelector(`input[name="question-${qId}"]:checked`);
+      const feedback = document.getElementById(`feedback-${qId}`);
+
+      if (!selected) {
+        feedback.className = 'feedback-box feedback-incorrect';
+        feedback.style.display = 'block';
+        feedback.innerHTML = '<strong>⚠️ Please select an option first!</strong>';
+        return;
+      }
+
+      const selectedValue = parseInt(selected.value);
+      feedback.style.display = 'block';
+
+      // Highlight options
+      q.options.forEach((_, i) => {
+        const lbl = document.getElementById(`label-${qId}-${i}`);
+        if (i === q.correct) {
+          lbl.style.borderColor = '#22c55e';
+          lbl.style.backgroundColor = '#14532d';
+        } else if (i === selectedValue && selectedValue !== q.correct) {
+          lbl.style.borderColor = '#ef4444';
+          lbl.style.backgroundColor = '#7f1d1d';
+        }
+      });
+
+      if (selectedValue === q.correct) {
+        feedback.className = 'feedback-box feedback-correct';
+        feedback.innerHTML = `<strong> Correct!</strong><br>${q.explanation}`;
+      } else {
+        feedback.className = 'feedback-box feedback-incorrect';
+        feedback.innerHTML = `<strong>❌ Incorrect.</strong> Correct answer is <strong>${String.fromCharCode(65 + q.correct)}</strong>.<br>${q.explanation}`;
+      }
+
+      updateTotalScore();
+    }
+
+    function checkAllAnswers() {
+      questions.forEach(q => checkSingleAnswer(q.id));
+    }
+
+    function updateTotalScore() {
+      let correctCount = 0;
+      questions.forEach(q => {
+        const selected = document.querySelector(`input[name="question-${q.id}"]:checked`);
+        if (selected && parseInt(selected.value) === q.correct) {
+          correctCount++;
+        }
+      });
+
+      const percent = Math.round((correctCount / questions.length) * 100);
+      const scoreBadge = document.getElementById('score-text');
+      scoreBadge.innerText = `${correctCount} / ${questions.length} (${percent}%)`;
+      
+      if (percent >= 80) {
+        scoreBadge.style.color = '#10b981';
+      } else if (percent >= 50) {
+        scoreBadge.style.color = '#f59e0b';
+      } else {
+        scoreBadge.style.color = '#ef4444';
+      }
+    }
+
+    // Initialize quiz on load
+    window.onload = renderQuiz;
+  </script>
+</body>
+</html>
