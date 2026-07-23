@@ -30,6 +30,12 @@ This glossary contains key terms and concepts that the learner has demonstrated 
 
 - **DOM**: tree representation of HTML
 - **Vite**: A modern, extremely fast frontend build tool and development server. It serves code using native browser ES Modules and compiles assets using Esbuild (written in Go), replacing older bundlers like Webpack and Create React App.
+- **Vite & Bundling**:
+  1. Older bundlers (Webpack / older Angular CLI) pre-bundled every single file before starting the server (taking 30–60s).
+  2. Vite serves code on-demand via native browser ES Modules (import/export), starting the dev server in ~100ms.
+  3. Vite pre-bundles dependencies with Esbuild (written in Go, 10x–100x faster than JS bundlers) and builds production bundles using Rollup.
+  4. Modern Angular 16+ CLI also uses Esbuild + Vite for its dev server!
+- **Observables vs. React Hooks**: React does **not** have built-in Observables (like RxJS `Observable` or `async` pipe in Angular). React uses **pull-based state snapshots** (`useState`, `useReducer`, `useContext`) and Promises (`async/await`) inside `useEffect`. While Angular relies heavily on RxJS push-based data streams, React handles state natively with hooks without requiring RxJS streams.
 - **JSX** (JavaScript XML) is a syntax extension for JavaScript. It looks like HTML, but it compiles down to regular JavaScript function calls.
 - **The Strict Rules of JSX**:
     1. Return a **Single Root Element**: tags wrapped in parent tag like <div> or React Fragment (<>...</>)
